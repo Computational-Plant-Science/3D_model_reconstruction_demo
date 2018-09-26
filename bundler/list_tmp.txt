@@ -1,0 +1,9 @@
+./examples/ET/et000.jpg
+./examples/ET/et001.jpg
+./examples/ET/et002.jpg
+./examples/ET/et003.jpg
+./examples/ET/et004.jpg
+./examples/ET/et005.jpg
+./examples/ET/et006.jpg
+./examples/ET/et007.jpg
+./examples/ET/et008.jpg

@@ -1,0 +1,16 @@
+
+PROJECT(graclus_lib CXX)
+
+IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
+	ADD_DEFINITIONS(-DNUMBITS=64)
+ENDIF(CMAKE_SIZEOF_VOID_P EQUAL 8)
+
+FILE(GLOB LIBRARY_FILES_C "metisLib/*.c")
+FILE(GLOB LIBRARY_FILES_H "metisLib/*.h")  
+
+ADD_LIBRARY(graclus_lib
+${LIBRARY_FILES_C}
+${LIBRARY_FILES_H}
+./multilevelLib/wkkm.c
+./multilevelLib/mlkkm.c
+)
