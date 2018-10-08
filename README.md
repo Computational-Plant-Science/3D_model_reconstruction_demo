@@ -1,4 +1,4 @@
-# VisualSFM builder for Linux (64 bit)
+# SFM for 3D root model reconstructure 
 
 ## Build requirements
 GTK toolkit development files, freeglut development files, libdevil development
@@ -11,12 +11,15 @@ will download, install, build and run the software. Subsequent runs of
 `./visualsfm.sh` launch the VisualSFM GUI.
 
 ## Author
+suxing liu(suxingliu@gmail.com)
+reference:
 [Anders Damsgaard](mailto:adamsgaard@ucsd.edu) with contributions by Caleb Adams 
 and Connor P Doherty.
+Changchang Wu ( wucc1130@gmail.com ) 
 
 ## Todo
 - VisualSFM is built without CUDA acceleration. Add optional GPU build.
 - Add support for CMVS/PMVS2
 
 ## License
-GNU Public License, v. 3. See ``LICENSE.txt`` for details.
+GNU Public License
