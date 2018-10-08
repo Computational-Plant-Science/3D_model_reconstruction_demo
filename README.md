@@ -5,10 +5,10 @@ GTK toolkit development files, freeglut development files, libdevil development
 files. Install all dependencies in Debian GNU/Linux with `make install-reqs`.
 
 ## Usage
-This script installs, builds and runs VisualSFM and its requirements SiftGPU
-and PBA in the directory. Simply execute `./visualsfm.sh`. On the first run it
-will download, install, build and run the software. Subsequent runs of 
-`./visualsfm.sh` launch the VisualSFM GUI.
+
+./vsfm-master/vsfm/bin/VisualSFM sfm+pairs /home/suxingliu/Root_image_data/3600_10_whole/PairList_90_2.txt 
+
+./vsfm-master/vsfm/bin/VisualSFM sfm+pmvs /home/suxingliu/Tree
 
 ## Author
 suxing liu(suxingliu@gmail.com)
