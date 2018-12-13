@@ -19,17 +19,17 @@ files. Install all dependencies in Debian GNU/Linux with `make install-reqs`.
 The singularity container is available on [Singularity Hub](https://www.singularity-hub.org)
 and can be run using
 ```bash
-singularity run shub://cotter/vsfm-master [VisualSFM paramaters]
+singularity run shub://cottersci/vsfm-master [VisualSFM paramaters]
 ```
 
 where [VisualSFM paramaters] are the input paramaters for VisualSFM. Using the local examples:
 
 ```bash
-singularity run shub://cotter/vsfm-master sfm+pairs /home/suxingliu/Root_image_data/3600_10_whole/PairList_90_2.txt
+singularity run shub://cottersci/vsfm-master sfm+pairs /home/suxingliu/Root_image_data/3600_10_whole/PairList_90_2.txt
 ```
 
 ```bash
-singularity run shub://cotter/vsfm-master sfm+pmvs /home/suxingliu/Tree
+singularity run shub://cottersci/vsfm-master sfm+pmvs /home/suxingliu/Tree
 ```
 
 
