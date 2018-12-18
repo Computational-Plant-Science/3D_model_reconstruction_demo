@@ -1,0 +1,36 @@
+BootStrap: docker
+From: ubuntu:16.04 
+
+%help
+  Install opencv and python standard libararies 
+
+%labels
+  Maintainer Chris Cotter
+  Version v0.01
+
+%post
+  apt-get update
+  apt -y install \
+    python2.7-dev\
+    python-pip\
+    build-essential\
+    libjpeg\
+    libjpeg-dev\
+    libfreetype6\
+    libfreetype6-dev\
+    zlib1g-dev\
+  
+  pip install --upgrade pip
+  
+  pip install \
+    numpy\ 
+    scipy\
+    matplotlib\
+    psutil\
+    PIL\
+    scikit-image\
+    opencv-contrib-python\
+
+%environment
+
+
