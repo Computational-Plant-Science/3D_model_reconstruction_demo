@@ -4,4 +4,10 @@ graclus1.2
 pba
 SiftGPU-master
 
+pmvs-2/program/main/*.o
+
+pmvs-2/program/main/Dependencies
+pmvs-2/program/main/pmvs2
+
+
 *.simg
