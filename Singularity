@@ -43,6 +43,7 @@ From: ubuntu:16.04
       liblapack-dev
 
   cd /opt/code
+  make clean
   make all
 
   chmod -R a+rwx /opt/code
