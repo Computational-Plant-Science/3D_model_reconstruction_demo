@@ -1,20 +1,5 @@
 # SFM for 3D root model reconstructure
 
-## Build requirements
-GTK toolkit development files, freeglut development files, libdevil development
-files. Install all dependencies in Debian GNU/Linux with `make install-reqs`.
-
-## Usage
-
-### Running Locally
-```bash
-./vsfm-master/vsfm/bin/VisualSFM sfm+pairs /home/suxingliu/Root_image_data/3600_10_whole/PairList_90_2.txt
-```
-
-```bash
-./vsfm-master/vsfm/bin/VisualSFM sfm+pmvs /home/suxingliu/Tree
-```
-
 ### Running With Singularity
 The singularity container is available on [Singularity Hub](https://www.singularity-hub.org)
 and can be run using
@@ -22,7 +7,7 @@ and can be run using
 singularity run shub://cottersci/vsfm-master [VisualSFM paramaters]
 ```
 
-where [VisualSFM paramaters] are the input paramaters for VisualSFM. Using the local examples:
+where [VisualSFM paramaters] are the input parameters for VisualSFM. Using the local examples:
 
 ```bash
 singularity run shub://cottersci/vsfm-master sfm+pairs /home/suxingliu/Root_image_data/3600_10_whole/PairList_90_2.txt
@@ -32,6 +17,68 @@ singularity run shub://cottersci/vsfm-master sfm+pairs /home/suxingliu/Root_imag
 singularity run shub://cottersci/vsfm-master sfm+pmvs /home/suxingliu/Tree
 ```
 
+## Compiling
+
+### Required Dependencies
+GTK toolkit development files, freeglut development files, libdevil development
+files.
+
+On Ubuntu:
+
+```bash
+apt install -y \
+    wget \
+    build-essential \
+    unzip \
+    libgtk2.0-dev \
+    libglew-dev \
+    libdevil-dev \
+    libboost-all-dev \
+    libatlas-cpp-0.6-dev \
+    libatlas-dev \
+    imagemagick \
+    libatlas3-base \
+    libcminpack-dev \
+    libgfortran3 \
+    libmetis-edf-dev \
+    libparmetis-dev \
+    freeglut3-dev \
+    libgsl-dev \
+    glew-utils \
+    libblas-dev \
+    liblapack-dev
+```
+
+### Building
+
+#### Locally
+The included Makefile will download and compile the necessary components not included in "Required Dependencies".
+
+```bash
+make all
+```
+
+#### Singulairty
+The singularity container can be built using
+
+```bash
+singularity build vsfm.img Singulairty
+```
+
+Then run using
+
+```bash
+singularity run vsfm.img
+```
+
+## Running Locally
+```bash
+./vsfm-master/vsfm/bin/VisualSFM sfm+pairs /home/suxingliu/Root_image_data/3600_10_whole/PairList_90_2.txt
+```
+
+```bash
+./vsfm-master/vsfm/bin/VisualSFM sfm+pmvs /home/suxingliu/Tree
+```
 
 ## Author
 suxing liu(suxingliu@gmail.com)

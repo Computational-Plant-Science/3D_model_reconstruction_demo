@@ -1,39 +1,57 @@
 BootStrap: docker
-From: ubuntu:16.04 
+From: ubuntu:16.04
 
 %help
   Help will go here
+
+  Special thanks goes to https://gist.github.com/lvisintini/e07abae48f099b913f9cf1c1f0fe43ba
 
 %labels
   Maintainer Chris Cotter
   Version v0.01
 
+%setup
+  mkdir ${SINGULARITY_ROOTFS}/opt/code/
+
+%files
+  ./* /opt/code
+
 %post
-  apt-get update
-  apt -y install \
-	git \
-    libgtk2.0-dev \
-    libglew-dev \
-    libdevil-dev \
-    libboost-all-dev \
-    libatlas-cpp-0.6-dev \
-    libatlas-dev \
-    imagemagick \
-    libatlas3-base \
-    libcminpack-dev \
-    libgfortran3 \
-    libmetis-edf-dev \
-    libparmetis-dev \
-    freeglut3-dev \
-    libgsl-dev \
-    
-  cd /opt
-  git clone https://github.com/lsx1980/vsfm-master.git
-  cd /opt/vsfm-master
+  #######################################################################################
+  # Install dependencies
+  apt update
+  apt install -y \
+      wget \
+      build-essential \
+      unzip \
+      libgtk2.0-dev \
+      libglew-dev \
+      libdevil-dev \
+      libboost-all-dev \
+      libatlas-cpp-0.6-dev \
+      libatlas-dev \
+      imagemagick \
+      libatlas3-base \
+      libcminpack-dev \
+      libgfortran3 \
+      libmetis-edf-dev \
+      libparmetis-dev \
+      freeglut3-dev \
+      libgsl-dev \
+      glew-utils \
+      libblas-dev \
+      liblapack-dev
+
+  cd /opt/code
+  make all
+
+  chmod -R a+rwx /opt/code
 
 %environment
-  PATH=$PATH:/opt/vsfm-master/vsfm/bin/
-  LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/vsfm-master/vsfm/bin/
+  PATH=$PATH:/opt/code/vsfm/bin/
+  export PATH
+  LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/code/vsfm/bin/
+  export LD_LIBRARY_PATH
 
 %runscript
-  /opt/vsfm-master/vsfm/bin/VisualSFM "$@"
+  /opt/code/vsfm/bin/VisualSFM "$@"
