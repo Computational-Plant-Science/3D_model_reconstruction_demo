@@ -9,6 +9,11 @@ vsfm/bin/libsiftgpu.so: vsfm
 	make -C SiftGPU-master
 	cp $(ROOT_DIR)/SiftGPU-master/bin/libsiftgpu.so $(ROOT_DIR)/vsfm/bin
 
+vsfm/bin/sift: vsfm
+	wget http://www.vlfeat.org/download/vlfeat-0.9.19-bin.tar.gz
+	tar xzf vlfeat-0.9.19-bin.tar.gz
+	cp $(ROOT_DIR)/vlfeat-0.9.19/bin/glnxa64/* $(ROOT_DIR)/vsfm/bin/
+
 vsfm:
 	wget http://ccwu.me/vsfm/download/VisualSFM_linux_64bit.zip
 	unzip VisualSFM_linux_64bit.zip
@@ -68,7 +73,7 @@ vsfm/bin/cmvs: pmvs-2/program/main/mylapack.o graclus1.2
 vsfm/bin/nv.ini:
 	cp $(ROOT_DIR)/config/nv.ini $(ROOT_DIR)/vsfm/bin/
 
-vsfm/bin/VisualSFM: vsfm vsfm/bin/nv.ini vsfm/bin/libsiftgpu.so vsfm/bin/libpba.so vsfm/bin/cmvs
+vsfm/bin/VisualSFM: vsfm vsfm/bin/nv.ini vsfm/bin/libsiftgpu.so vsfm/bin/libpba.so vsfm/bin/cmvs vsfm/bin/sift
 	make -C vsfm
 
 clean:
@@ -77,4 +82,5 @@ clean:
 	rm -rf graclus1.2
 	rm -rf pba
 	rm -rf cmvs
+	rm -rf vlfeat-*
 	make -C pmvs-2/program/main clean
