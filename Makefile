@@ -10,20 +10,20 @@ vsfm/bin/libsiftgpu.so: vsfm
 	cp $(ROOT_DIR)/SiftGPU-master/bin/libsiftgpu.so $(ROOT_DIR)/vsfm/bin
 
 vsfm/bin/sift: vsfm
-	wget http://www.vlfeat.org/download/vlfeat-0.9.19-bin.tar.gz
-	tar xzf vlfeat-0.9.19-bin.tar.gz
-	cp $(ROOT_DIR)/vlfeat-0.9.19/bin/glnxa64/* $(ROOT_DIR)/vsfm/bin/
-
-vsfm:
-	#wget http://ccwu.me/vsfm/download/VisualSFM_linux_64bit.zip
-	#unzip VisualSFM_linux_64bit.zip
-	#rm VisualSFM_linux_64bit.zip
+	#wget http://www.vlfeat.org/download/vlfeat-0.9.19-bin.tar.gz
+	#tar xzf vlfeat-0.9.19-bin.tar.gz
+	#cp $(ROOT_DIR)/vlfeat-0.9.19/bin/glnxa64/* $(ROOT_DIR)/vsfm/bin/
 	
 	wget http://www.vlfeat.org/download/vlfeat-0.9.19.tar.gz
 	tar xzf vlfeat-0.9.19.tar.gz
 	make -C vlfeat-0.9.19
 	cp -r $(ROOT_DIR)/vlfeat-0.9.19/bin/glnxa64/* $(ROOT_DIR)/vsfm/bin/
 	rm vlfeat-0.9.19.tar.gz
+
+vsfm:
+	wget http://ccwu.me/vsfm/download/VisualSFM_linux_64bit.zip
+	unzip VisualSFM_linux_64bit.zip
+	rm VisualSFM_linux_64bit.zip
 	
 vsfm/bin/libpba.so: vsfm
 	wget http://grail.cs.washington.edu/projects/mcba/pba_v1.0.5.zip
