@@ -1,9 +1,0 @@
-mogrify -format pgm ./examples/ET/et000.jpg; ./bin/sift < ./examples/ET/et000.pgm > ./examples/ET/et000.key; rm ./examples/ET/et000.pgm; gzip -f ./examples/ET/et000.key
-mogrify -format pgm ./examples/ET/et001.jpg; ./bin/sift < ./examples/ET/et001.pgm > ./examples/ET/et001.key; rm ./examples/ET/et001.pgm; gzip -f ./examples/ET/et001.key
-mogrify -format pgm ./examples/ET/et002.jpg; ./bin/sift < ./examples/ET/et002.pgm > ./examples/ET/et002.key; rm ./examples/ET/et002.pgm; gzip -f ./examples/ET/et002.key
-mogrify -format pgm ./examples/ET/et003.jpg; ./bin/sift < ./examples/ET/et003.pgm > ./examples/ET/et003.key; rm ./examples/ET/et003.pgm; gzip -f ./examples/ET/et003.key
-mogrify -format pgm ./examples/ET/et004.jpg; ./bin/sift < ./examples/ET/et004.pgm > ./examples/ET/et004.key; rm ./examples/ET/et004.pgm; gzip -f ./examples/ET/et004.key
-mogrify -format pgm ./examples/ET/et005.jpg; ./bin/sift < ./examples/ET/et005.pgm > ./examples/ET/et005.key; rm ./examples/ET/et005.pgm; gzip -f ./examples/ET/et005.key
-mogrify -format pgm ./examples/ET/et006.jpg; ./bin/sift < ./examples/ET/et006.pgm > ./examples/ET/et006.key; rm ./examples/ET/et006.pgm; gzip -f ./examples/ET/et006.key
-mogrify -format pgm ./examples/ET/et007.jpg; ./bin/sift < ./examples/ET/et007.pgm > ./examples/ET/et007.key; rm ./examples/ET/et007.pgm; gzip -f ./examples/ET/et007.key
-mogrify -format pgm ./examples/ET/et008.jpg; ./bin/sift < ./examples/ET/et008.pgm > ./examples/ET/et008.key; rm ./examples/ET/et008.pgm; gzip -f ./examples/ET/et008.key
