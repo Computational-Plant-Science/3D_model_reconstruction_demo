@@ -10,11 +10,11 @@ singularity run shub://cottersci/vsfm-master [VisualSFM paramaters]
 where [VisualSFM paramaters] are the input parameters for VisualSFM. Using the local examples:
 
 ```bash
-singularity run shub://cottersci/vsfm-master sfm+pairs /home/suxingliu/Root_image_data/3600_10_whole/PairList_90_2.txt
+singularity run shub://cottersci/vsfm-master sfm+pairs /$root/Root_image_data/3600_10_whole/PairList_90_2.txt
 ```
 
 ```bash
-singularity run shub://cottersci/vsfm-master sfm+pmvs /home/suxingliu/Tree
+singularity run shub://cottersci/vsfm-master sfm+pmvs /$root/Tree
 ```
 
 ## Compiling
