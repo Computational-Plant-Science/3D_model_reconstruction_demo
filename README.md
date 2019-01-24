@@ -73,11 +73,11 @@ singularity run vsfm.img
 
 ## Running Locally
 ```bash
-./vsfm-master/vsfm/bin/VisualSFM sfm+pairs /home/suxingliu/Root_image_data/3600_10_whole/PairList_90_2.txt
+./vsfm-master/vsfm/bin/VisualSFM sfm+pairs /&root/Root_image_data/3600_10_whole/PairList_90_2.txt
 ```
 
 ```bash
-./vsfm-master/vsfm/bin/VisualSFM sfm+pmvs /home/suxingliu/Tree
+./vsfm-master/vsfm/bin/VisualSFM sfm+pmvs /$root/Tree
 ```
 
 ## Author
