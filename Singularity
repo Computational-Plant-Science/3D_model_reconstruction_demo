@@ -40,7 +40,7 @@ From: ubuntu:16.04
       libgfortran3 \
       libmetis-edf-dev \
       libparmetis-dev \
-      libjpeg8 \
+      libjpeg-turbo8 \
       libgsl-dev \
       freeglut3-dev
 
