@@ -24,23 +24,25 @@ From: ubuntu:16.04
       wget \
       build-essential \
       unzip \
+      glew-utils \
+      imagemagick \
       libgtk2.0-dev \
       libglew-dev \
       libdevil-dev \
       libboost-all-dev \
       libatlas-cpp-0.6-dev \
       libatlas-dev \
-      imagemagick \
-      libatlas3-base \
+      libatlas-base-dev \
+      liblapack3 \
+      libblas3 \
+      libblas-dev \
       libcminpack-dev \
       libgfortran3 \
       libmetis-edf-dev \
       libparmetis-dev \
-      freeglut3-dev \
+      libjpeg8 \
       libgsl-dev \
-      glew-utils \
-      libblas-dev \
-      liblapack-dev
+      freeglut3-dev
 
   cd /opt/code
   make clean
