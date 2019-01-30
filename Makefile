@@ -42,6 +42,7 @@ vsfm/bin/libpba.so: vsfm
 	#WITHOUT CUDA
 	mv pba/makefile pba/makefile_with_gpu
 	mv pba/makefile_no_gpu pba/makefile
+	patch pba/makefile patches/pba_non_native.patch
 	make -C pba
 	cp $(ROOT_DIR)/pba/bin/libpba_no_gpu.so $(ROOT_DIR)/vsfm/bin/libpba.so
 
