@@ -10,11 +10,11 @@ singularity run shub://cottersci/vsfm-master [VisualSFM paramaters]
 where [VisualSFM paramaters] are the input parameters for VisualSFM. Using the local examples:
 
 ```bash
-singularity run shub://cottersci/vsfm-master sfm+pairs /$root/Root_image_data/3600_10_whole/PairList_90_2.txt
+singularity run shub://cottersci/vsfm-master sfm+pairs /$root/$path_to_your_pairlist_file/
 ```
 
 ```bash
-singularity run shub://cottersci/vsfm-master sfm+pmvs /$root/Tree
+singularity run shub://cottersci/vsfm-master sfm+pmvs /$root/$path_to_your_image_file_folder/
 ```
 
 ## Compiling
@@ -97,7 +97,7 @@ Singularity container overlay issue solved by [Saravanaraj Ayyampalayam] (https:
 ## Todo
 - VisualSFM is built without CUDA acceleration. Add optional GPU build.
 - Add support for CMVS/PMVS2
-- support GPU based SIFT feature matting
+- support GPU based SIFT feature matching
 
 ## License
 GNU Public License
