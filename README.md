@@ -26,27 +26,30 @@ files.
 On Ubuntu:
 
 ```bash
-apt install -y \
-    wget \
-    build-essential \
-    unzip \
-    libgtk2.0-dev \
-    libglew-dev \
-    libdevil-dev \
-    libboost-all-dev \
-    libatlas-cpp-0.6-dev \
-    libatlas-dev \
-    imagemagick \
-    libatlas3-base \
-    libcminpack-dev \
-    libgfortran3 \
-    libmetis-edf-dev \
-    libparmetis-dev \
-    freeglut3-dev \
-    libgsl-dev \
-    glew-utils \
-    libblas-dev \
-    liblapack-dev
+apt update
+  apt install -y \
+      wget \
+      build-essential \
+      unzip \
+      glew-utils \
+      imagemagick \
+      libgtk2.0-dev \
+      libglew-dev \
+      libdevil-dev \
+      libboost-all-dev \
+      libatlas-cpp-0.6-dev \
+      libatlas-dev \
+      libatlas-base-dev \
+      liblapack3 \
+      libblas3 \
+      libblas-dev \
+      libcminpack-dev \
+      libgfortran3 \
+      libmetis-edf-dev \
+      libparmetis-dev \
+      libjpeg-turbo8 \
+      libgsl-dev \
+      freeglut3-dev
 ```
 
 ### Building
@@ -62,22 +65,22 @@ make all
 The singularity container can be built using
 
 ```bash
-singularity build vsfm.img Singulairty
+singularity build --writable vsfm.img Singularity
 ```
 
 Then run using
 
 ```bash
-singularity run vsfm.img
+singularity exec --writable vsfm.img /opt/code/vsfm/bin/VisualSFM  sfm+pmvs /$root/$path_to_your_image_file_folder/
 ```
 
 ## Running Locally
 ```bash
-./vsfm-master/vsfm/bin/VisualSFM sfm+pairs /&root/Root_image_data/3600_10_whole/PairList_90_2.txt
+./opt/code/vsfm/bin/VisualSFM sfm+pairs /$root/$path_to_your_pairlist_file/
 ```
 
 ```bash
-./vsfm-master/vsfm/bin/VisualSFM sfm+pmvs /$root/Tree
+./opt/code/vsfm/bin/VisualSFM sfm+pmvs /$root/$path_to_your_image_file_folder/
 ```
 
 ## Author
@@ -88,10 +91,13 @@ and Connor P Doherty.
 Changchang Wu ( wucc1130@gmail.com )
 
 Singularity container maintained by [Chris Cotter](http://github.com/cottersci).
+Singularity container overlay issue solved by [Saravanaraj Ayyampalayam] (https://github.com/raj76) raj76@uga.edu
+
 
 ## Todo
 - VisualSFM is built without CUDA acceleration. Add optional GPU build.
 - Add support for CMVS/PMVS2
+- support GPU based SIFT feature matting
 
 ## License
 GNU Public License
