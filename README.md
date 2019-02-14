@@ -4,7 +4,7 @@
 The singularity container is available on [Singularity Hub](https://www.singularity-hub.org)
 and can be run using
 ```bash
-singularity run shub://cottersci/vsfm-master [VisualSFM paramaters]
+singularity exec --overlay file.img shub://lsx1980/vsfm-master [VisualSFM paramaters]
 ```
 
 where [VisualSFM paramaters] are the input parameters for VisualSFM. Using the local examples:
