@@ -23,13 +23,13 @@ import matplotlib.pyplot as plt
 
 import glob
 
-import concurrent.futures
+#import concurrent.futures
 import multiprocessing
 from multiprocessing import Pool
 from contextlib import closing
 
 import cv2
-import psutil
+#import psutil
 
 from PIL import Image
 
