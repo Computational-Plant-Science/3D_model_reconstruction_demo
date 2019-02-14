@@ -9,12 +9,16 @@ singularity run shub://cottersci/vsfm-master [VisualSFM paramaters]
 
 where [VisualSFM paramaters] are the input parameters for VisualSFM. Using the local examples:
 
+# make file image for program to store temprary files
+dd if=/dev/zero of=file.img bs=1k count=50000
+mkfs -t ext3 file.img
+
 ```bash
-singularity run shub://cottersci/vsfm-master sfm+pairs /$root/$path_to_your_pairlist_file/
+singularity exec --overlay file.img shub://lsx1980/vsfm-master /opt/code/vsfm/bin/VisualSFM sfm+pairs /$root/$path_to_your_pairlist_file/
 ```
 
 ```bash
-singularity run shub://cottersci/vsfm-master sfm+pmvs /$root/$path_to_your_image_file_folder/
+singularity exec --overlay file.img shub://lsx1980/vsfm-master /opt/code/vsfm/bin/VisualSFM sfm+pmvs /$root/$path_to_your_image_file_folder/
 ```
 
 ## Compiling
