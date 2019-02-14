@@ -91,7 +91,7 @@ and Connor P Doherty.
 Changchang Wu ( wucc1130@gmail.com )
 
 Singularity container maintained by [Chris Cotter](http://github.com/cottersci).
-Singularity container overlay issue solved by [Saravanaraj Ayyampalayam] (https://github.com/raj76) raj76@uga.edu
+Singularity container overlay issue solved by [Saravanaraj Ayyampalayam] (https://github.com/raj76) (mailto:raj76@uga.edu)
 
 
 ## Todo
