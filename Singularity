@@ -47,7 +47,9 @@ From: ubuntu:16.04
   cd /opt/code
   make clean
   make all
-
+  
+  mkdir /lscratch /db /work /scratch
+  
   chmod -R a+rwx /opt/code
 
 %environment
