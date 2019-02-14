@@ -9,7 +9,7 @@ singularity exec --overlay file.img shub://lsx1980/vsfm-master [VisualSFM parama
 
 where [VisualSFM paramaters] are the input parameters for VisualSFM. Using the local examples:
 
-# make file image for program to store temprary files
+### Creat file image for program to store temprary files
 dd if=/dev/zero of=file.img bs=1k count=50000
 mkfs -t ext3 file.img
 
