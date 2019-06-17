@@ -23,7 +23,6 @@ From: ubuntu:16.04
   apt install -y \
       wget \
       build-essential \
-      python3 \
       unzip \
       glew-utils \
       imagemagick \
