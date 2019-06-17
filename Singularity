@@ -7,7 +7,7 @@ From: ubuntu:16.04
   Special thanks goes to https://gist.github.com/lvisintini/e07abae48f099b913f9cf1c1f0fe43ba
 
 %labels
-  Maintainer Chris Cotter
+  Maintainer: Chris Cotter
   Version v0.01
 
 %setup
