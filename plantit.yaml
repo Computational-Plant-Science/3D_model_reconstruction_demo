@@ -2,4 +2,4 @@ public: True
 clone: False
 input: 'directory'
 image: shub://lsx1980/vsfm-master
-commands: ["/opt/code/vsfm/bin/VisualSFM", "sfm+pmvs", "$INPUT"]
+commands: /opt/code/vsfm/bin/VisualSFM sfm+pmvs $INPUT
