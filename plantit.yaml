@@ -1,5 +1,7 @@
+name: 3D Root Model Reconstruction
 public: True
 clone: False
 input: 'directory'
+output: 'file'
 image: shub://lsx1980/vsfm-master
 commands: /opt/code/vsfm/bin/VisualSFM sfm+pmvs $INPUT
