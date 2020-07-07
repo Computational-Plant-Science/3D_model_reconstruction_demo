@@ -1,4 +1,5 @@
 name: 3D Root Model Reconstruction
+author: Suxing Liu
 public: True
 clone: False
 input: 'directory'
