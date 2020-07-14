@@ -1,8 +1,8 @@
-name: 3D Root Model Reconstruction
+name: 3D Root Reconstruction
 author: Suxing Liu
+image: shub://lsx1980/vsfm-master
 public: True
 clone: False
 from: directory
 to: file
-image: shub://lsx1980/vsfm-master
 commands: /opt/code/vsfm/bin/VisualSFM sfm+pmvs $INPUT $OUTPUT
