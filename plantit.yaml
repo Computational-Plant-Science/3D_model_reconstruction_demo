@@ -5,4 +5,4 @@ public: True
 clone: False
 from: directory
 to: file
-commands: /opt/code/vsfm/bin/VisualSFM sfm+pmvs $INPUT $OUTPUT
+commands: /opt/code/vsfm/bin/VisualSFM sfm+pmvs "$INPUT" "$OUTPUT"
