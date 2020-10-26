@@ -6,4 +6,4 @@ clone: False
 from: directory
 to: file
 commands: /opt/code/vsfm/bin/VisualSFM sfm+pmvs "$INPUT" "$OUTPUT"
-logo: Root3D.jpg
+logo: Root3D.png
