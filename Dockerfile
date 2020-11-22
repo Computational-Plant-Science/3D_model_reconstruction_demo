@@ -35,7 +35,7 @@ RUN cd /opt/code && \
     make clean && \
     make all && \
     mkdir /lscratch /db /work /scratch && \
-    chmod -r a+rwx /opt/code
+    chmod -R a+rwx /opt/code
 
 ENV PATH=$PATH:/opt/code/vsfm/bin/
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/code/vsfm/bin/

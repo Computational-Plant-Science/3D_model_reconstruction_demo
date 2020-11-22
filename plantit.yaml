@@ -1,6 +1,6 @@
 name: DIRT\3D - 3D Reconstruction Module
 author: Suxing Liu
-image: shub://lsx1980/vsfm-master
+image: docker://computationalplantscience/3d-model-reconstruction
 public: True
 clone: False
 from: directory
