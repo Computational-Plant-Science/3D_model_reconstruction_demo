@@ -5,7 +5,7 @@ pba
 SiftGPU-master
 vlfeat-*
 pmvs-2/program/main/*.o
-
+.idea
 pmvs-2/program/main/Dependencies
 pmvs-2/program/main/pmvs2
 
