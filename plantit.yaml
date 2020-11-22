@@ -6,4 +6,9 @@ clone: False
 from: directory
 to: file
 commands: /opt/code/vsfm/bin/VisualSFM sfm+pmvs "$INPUT" "$OUTPUT"
-logo: root_logo.jpg
+logo: Root3D.png
+resources:
+  time: "05:00:00"
+  mem: "40GB"
+  tasks: 1
+  cores: 10

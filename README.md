@@ -13,10 +13,12 @@ where [VisualSFM paramaters] are the input parameters for VisualSFM. Using the l
 dd if=/dev/zero of=file.img bs=1k count=50000
 
 mkfs -t ext3 file.img
-
+(ref: https://sylabs.io/guides/3.6/user-guide/persistent_overlays.html)
 or
 
 singularity image.create --size 50 file.img
+
+(singularity version 2.6)
 
 ```bash
 singularity exec --overlay file.img shub://lsx1980/vsfm-master /opt/code/vsfm/bin/VisualSFM sfm+pairs /$root/$path_to_your_pairlist_file/
