@@ -1,4 +1,4 @@
-# SFM for 3D root model reconstructure
+# SFM for 3D root model reconstruction
 
 ### Running With Singularity
 The singularity container is available on [Singularity Hub](https://www.singularity-hub.org)
@@ -86,9 +86,6 @@ singularity exec --writable vsfm.img /opt/code/vsfm/bin/VisualSFM  sfm+pmvs /$ro
 ```
 
 ## Running Locally
-```bash
-./opt/code/vsfm/bin/VisualSFM sfm+pairs /$root/$path_to_your_pairlist_file/
-```
 
 ```bash
 ./opt/code/vsfm/bin/VisualSFM sfm+pmvs /$root/$path_to_your_image_file_folder/
