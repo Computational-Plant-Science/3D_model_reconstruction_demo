@@ -1,9 +1,8 @@
 # SFM for 3D root model reconstruction
 
 ### Running With Singularity
-The singularity container is available on [Singularity Hub](https://www.singularity-hub.org)
-and Docker hub. https://hub.docker.com/r/computationalplantscience/3d-model-reconstruction.
-It can be run using
+The singularity container is available on Dockerhub. https://hub.docker.com/r/computationalplantscience/3d-model-reconstruction.
+The container can be executed using
 ```bash
 singularity exec --overlay file.img shub://lsx1980/vsfm-master [VisualSFM paramaters]
 ```
