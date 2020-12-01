@@ -10,7 +10,7 @@ singularity exec --overlay file.img shub://lsx1980/vsfm-master [VisualSFM parama
 
 where [VisualSFM paramaters] are the input parameters for VisualSFM. Using the local examples:
 
-### Creat file image for program to store temprary files
+### Create file image to store temprary files
 dd if=/dev/zero of=file.img bs=1k count=50000
 
 mkfs -t ext3 file.img
@@ -95,9 +95,7 @@ reference:
 and Connor P Doherty.
 Changchang Wu ( wucc1130@gmail.com )
 
-Singularity container maintained by [Chris Cotter](http://github.com/cottersci).
-
-Singularity container overlay issue solved by [Saravanaraj Ayyampalayam] (https://github.com/raj76) (mailto:raj76@uga.edu)
+Singularity container overlay issues were solved by [Saravanaraj Ayyampalayam] (https://github.com/raj76) (mailto:raj76@uga.edu)
 
 Special thanks to Chris Cotter building the container recipe for testing and debugging.
 
