@@ -3,6 +3,7 @@ author: Suxing Liu
 image: docker://computationalplantscience/3d-model-reconstruction
 public: True
 clone: False
+from_directory: True
 from:
 to: output
 commands: /opt/code/vsfm/bin/VisualSFM sfm+pmvs "$INPUT" "$OUTPUT"
