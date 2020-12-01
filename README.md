@@ -2,7 +2,8 @@
 
 ### Running With Singularity
 The singularity container is available on [Singularity Hub](https://www.singularity-hub.org)
-and can be run using
+and Docker hub. https://hub.docker.com/r/computationalplantscience/3d-model-reconstruction.
+It can be run using
 ```bash
 singularity exec --overlay file.img shub://lsx1980/vsfm-master [VisualSFM paramaters]
 ```
@@ -19,10 +20,6 @@ or
 singularity image.create --size 50 file.img
 
 (singularity version 2.6)
-
-```bash
-singularity exec --overlay file.img shub://lsx1980/vsfm-master /opt/code/vsfm/bin/VisualSFM sfm+pairs /$root/$path_to_your_pairlist_file/
-```
 
 ```bash
 singularity exec --overlay file.img shub://lsx1980/vsfm-master /opt/code/vsfm/bin/VisualSFM sfm+pmvs /$root/$path_to_your_image_file_folder/
