@@ -1,0 +1,15 @@
+name: DIRT\3D - 3D Reconstruction Module
+author: Suxing Liu
+image: docker://computationalplantscience/3d-model-reconstruction
+public: True
+clone: False
+from_directory: True
+from:
+to: output
+commands: /opt/code/vsfm/bin/VisualSFM sfm+pmvs "$INPUT" "$OUTPUT"
+logo: Root3D.png
+resources:
+  time: "05:00:00"
+  mem: "40GB"
+  tasks: 1
+  cores: 10

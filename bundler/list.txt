@@ -1,0 +1,9 @@
+./examples/ET/et000.jpg 0 660.80306
+./examples/ET/et001.jpg 0 660.80306
+./examples/ET/et002.jpg 0 660.80306
+./examples/ET/et003.jpg 0 660.80306
+./examples/ET/et004.jpg 0 660.80306
+./examples/ET/et005.jpg 0 660.80306
+./examples/ET/et006.jpg 0 660.80306
+./examples/ET/et007.jpg 0 660.80306
+./examples/ET/et008.jpg 0 660.80306

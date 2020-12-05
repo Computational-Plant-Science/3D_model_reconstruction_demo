@@ -1,0 +1,107 @@
+# SFM for 3D root model reconstruction
+
+### Running With Singularity
+The singularity container is available on Dockerhub. https://hub.docker.com/r/computationalplantscience/3d-model-reconstruction.
+The container can be executed using
+```bash
+singularity exec --overlay file.img shub://lsx1980/vsfm-master [VisualSFM paramaters]
+```
+
+where [VisualSFM paramaters] are the input parameters for VisualSFM. Using the local examples:
+
+### Create file image to store temprary files
+dd if=/dev/zero of=file.img bs=1k count=50000
+
+mkfs -t ext3 file.img
+(ref: https://sylabs.io/guides/3.6/user-guide/persistent_overlays.html)
+or
+
+singularity image.create --size 50 file.img
+
+(singularity version 2.6)
+
+```bash
+singularity exec --overlay file.img shub://lsx1980/vsfm-master /opt/code/vsfm/bin/VisualSFM sfm+pmvs /$root/$path_to_your_image_file_folder/
+```
+
+## Compiling
+
+### Required Dependencies
+GTK toolkit development files, freeglut development files, libdevil development
+files.
+
+On Ubuntu:
+
+```bash
+apt update
+  apt install -y \
+      wget \
+      build-essential \
+      unzip \
+      glew-utils \
+      imagemagick \
+      libgtk2.0-dev \
+      libglew-dev \
+      libdevil-dev \
+      libboost-all-dev \
+      libatlas-cpp-0.6-dev \
+      libatlas-dev \
+      libatlas-base-dev \
+      liblapack3 \
+      libblas3 \
+      libblas-dev \
+      libcminpack-dev \
+      libgfortran3 \
+      libmetis-edf-dev \
+      libparmetis-dev \
+      libjpeg-turbo8 \
+      libgsl-dev \
+      freeglut3-dev
+```
+
+### Building
+
+#### Locally
+The included Makefile will download and compile the necessary components not included in "Required Dependencies".
+
+```bash
+make all
+```
+
+#### Singulairty
+The singularity container can be built using
+
+```bash
+singularity build --writable vsfm.img Singularity
+```
+
+Then run using
+
+```bash
+singularity exec --writable vsfm.img /opt/code/vsfm/bin/VisualSFM  sfm+pmvs /$root/$path_to_your_image_file_folder/
+```
+
+## Running Locally
+
+```bash
+./opt/code/vsfm/bin/VisualSFM sfm+pmvs /$root/$path_to_your_image_file_folder/
+```
+
+## Author
+suxing liu(suxingliu@gmail.com)
+reference:
+[Anders Damsgaard](mailto:adamsgaard@ucsd.edu) with contributions by Caleb Adams
+and Connor P Doherty.
+Changchang Wu ( wucc1130@gmail.com )
+
+Singularity container overlay issues were solved by [Saravanaraj Ayyampalayam] (https://github.com/raj76) (mailto:raj76@uga.edu)
+
+Special thanks to Chris Cotter building the container recipe for testing and debugging.
+
+## Todo
+- VisualSFM is built without CUDA acceleration. Add optional GPU build.
+- Add support for CMVS/PMVS2
+- support GPU based SIFT feature matching
+
+## License
+GNU Public License

@@ -1,0 +1,7 @@
+numpy
+scipy
+matplotlib
+psutil
+PIL
+scikit-image
+opencv-contrib-python
