@@ -1,15 +1,15 @@
-# SFM for 3D root model reconstructure
+# SFM for 3D root model reconstruction
 
 ### Running With Singularity
-The singularity container is available on [Singularity Hub](https://www.singularity-hub.org)
-and can be run using
+The singularity container is available on Dockerhub. https://hub.docker.com/r/computationalplantscience/3d-model-reconstruction.
+The container can be executed using
 ```bash
 singularity exec --overlay file.img shub://lsx1980/vsfm-master [VisualSFM paramaters]
 ```
 
 where [VisualSFM paramaters] are the input parameters for VisualSFM. Using the local examples:
 
-### Creat file image for program to store temprary files
+### Create file image to store temprary files
 dd if=/dev/zero of=file.img bs=1k count=50000
 
 mkfs -t ext3 file.img
@@ -19,10 +19,6 @@ or
 singularity image.create --size 50 file.img
 
 (singularity version 2.6)
-
-```bash
-singularity exec --overlay file.img shub://lsx1980/vsfm-master /opt/code/vsfm/bin/VisualSFM sfm+pairs /$root/$path_to_your_pairlist_file/
-```
 
 ```bash
 singularity exec --overlay file.img shub://lsx1980/vsfm-master /opt/code/vsfm/bin/VisualSFM sfm+pmvs /$root/$path_to_your_image_file_folder/
@@ -86,9 +82,6 @@ singularity exec --writable vsfm.img /opt/code/vsfm/bin/VisualSFM  sfm+pmvs /$ro
 ```
 
 ## Running Locally
-```bash
-./opt/code/vsfm/bin/VisualSFM sfm+pairs /$root/$path_to_your_pairlist_file/
-```
 
 ```bash
 ./opt/code/vsfm/bin/VisualSFM sfm+pmvs /$root/$path_to_your_image_file_folder/
@@ -101,9 +94,7 @@ reference:
 and Connor P Doherty.
 Changchang Wu ( wucc1130@gmail.com )
 
-Singularity container maintained by [Chris Cotter](http://github.com/cottersci).
-
-Singularity container overlay issue solved by [Saravanaraj Ayyampalayam] (https://github.com/raj76) (mailto:raj76@uga.edu)
+Singularity container overlay issues were solved by [Saravanaraj Ayyampalayam] (https://github.com/raj76) (mailto:raj76@uga.edu)
 
 Special thanks to Chris Cotter building the container recipe for testing and debugging.
 
