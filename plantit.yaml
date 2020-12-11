@@ -5,7 +5,7 @@ public: True
 clone: False
 from_directory: True
 from:
-to: output
+to:
 commands: /opt/code/vsfm/bin/VisualSFM sfm+pmvs "$INPUT" "$OUTPUT"
 logo: Root3D.png
 resources:
