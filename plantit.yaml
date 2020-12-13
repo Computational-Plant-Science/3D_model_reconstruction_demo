@@ -6,7 +6,8 @@ clone: False
 from_directory: True
 from:
 to:
-commands: /opt/code/vsfm/bin/VisualSFM sfm+pmvs "$INPUT" "$OUTPUT"
+commands: mkdir  && mkfs.ext3 overlay.img && /opt/code/vsfm/bin/VisualSFM sfm+pmvs "$INPUT" "$OUTPUT"
+mount: vsfm/bin
 logo: Root3D.png
 resources:
   time: "12:00:00"
