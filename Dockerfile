@@ -40,3 +40,8 @@ RUN cd /opt/code && \
 ENV PATH=$PATH:/opt/code/vsfm/bin/
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/code/vsfm/bin/
 
+RUN mkdir /opt/code/vsfm/bin/temp && \
+    touch /opt/code/vsfm/bin/temp.pgm && \
+    touch /opt/code/vsfm/bin/temp/temp.pgm && \
+    ls -s /opt/code/vsfm/bin/temp/temp.pgm /opt/code/vsfm/bin/temp.pgm
+

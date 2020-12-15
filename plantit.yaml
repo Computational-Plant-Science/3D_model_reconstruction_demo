@@ -7,7 +7,7 @@ from_directory: True
 from:
 to:
 commands: /opt/code/vsfm/bin/VisualSFM sfm+pmvs "$INPUT" "$OUTPUT"
-mount: vsfm/bin
+mount: /opt/code/vsfm/bin/temp
 logo: Root3D.png
 resources:
   time: "12:00:00"
