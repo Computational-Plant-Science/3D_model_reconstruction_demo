@@ -43,6 +43,8 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/code/vsfm/bin/
 RUN mkdir -p /opt/code/vsfm/bin/log && \
     mkdir -p /opt/code/vsfm/bin/temp/log && \
     touch /opt/code/vsfm/bin/temp/temp.pgm && \
+    touch /opt/code/vsfm/bin/temp/temp.sift.sift && \
     ln -s /opt/code/vsfm/bin/temp/temp.pgm /opt/code/vsfm/bin/temp.pgm && \
+    ln -s /opt/code/vsfm/bin/temp/temp.sift.sift /opt/code/vsfm/bin/temp.sift.sift && \
     ln -s /opt/code/vsfm/bin/temp/log /opt/code/vsfm/bin/log
 
