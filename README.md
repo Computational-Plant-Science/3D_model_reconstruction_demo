@@ -94,6 +94,8 @@ reference:
 and Connor P Doherty.
 Changchang Wu ( wucc1130@gmail.com )
 
+Singularity container was maintained by Wesley Paul Bonelli. And it was deployed to Plant IT website by Wesley Paul Bonelli (wbonelli@uga.edu).
+
 Singularity container overlay issues were solved by [Saravanaraj Ayyampalayam] (https://github.com/raj76) (mailto:raj76@uga.edu)
 
 Special thanks to Chris Cotter building the container recipe for testing and debugging.
