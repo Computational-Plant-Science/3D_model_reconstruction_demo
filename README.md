@@ -1,7 +1,8 @@
 # SFM for 3D root model reconstruction
 
+please install singularity container version 3.6 using https://sylabs.io/guides/3.6/user-guide/quick_start.html#quick-installation-steps
 ### Running With Singularity
-The singularity container is available on Dockerhub. https://hub.docker.com/r/computationalplantscience/3d-model-reconstruction.
+The docker container is available on Dockerhub. https://hub.docker.com/r/computationalplantscience/3d-model-reconstruction.
 The container can be executed using
 ```bash
 singularity exec --overlay file.img shub://lsx1980/vsfm-master [VisualSFM paramaters]
@@ -72,7 +73,7 @@ make all
 The singularity container can be built using
 
 ```bash
-singularity build --writable vsfm.img Singularity
+singularity build vsfm.img Singularity
 ```
 
 Then run using
