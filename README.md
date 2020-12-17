@@ -24,17 +24,17 @@ Steps to run this package in container locally:
 3. Collect the 3D model result
    After the container was executed successfully with image data files, user should be able to see output at command window like this:
 
-  '''
-  Save to /$PATH_TO_IMAGE_FOLDER/vsfm.nvm ... done
-  Save /$PATH_TO_IMAGE_FOLDER/vsfm.0.ply ...done
+   '''
+   Save to /$PATH_TO_IMAGE_FOLDER/vsfm.nvm ... done
+   Save /$PATH_TO_IMAGE_FOLDER/vsfm.0.ply ...done
 
-  VisualSFM 3D reconstruction, finished
-  Totally 15.000 seconds used
+   VisualSFM 3D reconstruction, finished
+   Totally 15.000 seconds used
 
-  LogFile: /opt/code/vsfm/bin/log/[20_12_17][15_26_12][690].log
-  '''
+   LogFile: /opt/code/vsfm/bin/log/[20_12_17][15_26_12][690].log
+   '''
 
-  The 3D model was stored as point cloud in ply format at /$PATH_TO_IMAGE_FOLDER/vsfm.0.ply.
+   The 3D model was stored as point cloud in ply format at /$PATH_TO_IMAGE_FOLDER/vsfm.0.ply.
 
 
 
