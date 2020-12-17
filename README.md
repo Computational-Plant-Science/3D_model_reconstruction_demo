@@ -17,6 +17,7 @@ Once singularity was successfully installed, the container can be executed using
 singularity exec --home  $PWD/  –bind  /$PWD:/opt/code/vsfm/bin/temp,/$PWD:/opt/code/vsfm/bin/log docker://computationalplantscience/3d-model-reconstruction /opt/code/vsfm/bin/VisualSFM  sfm+pmvs  /$PATH_TO_IMAGE_FOLDER/
 
 "$PWD" : can be replaced by user’s local path for store temporary files.
+
 $PATH_TO_IMAGE_FOLDER/:  can be replaced by user’s image data folder. 
 
 3. Collect the 3D model result
