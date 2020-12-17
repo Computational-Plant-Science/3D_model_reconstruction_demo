@@ -22,8 +22,7 @@ $PATH_TO_IMAGE_FOLDER/:  can be replaced by user’s image data folder.
 3. Collect the 3D model result
 After the container was executed successfully with image data files, user should be able to see output at command window like this:
 
-#################################
-
+'''
 Save to /$PATH_TO_IMAGE_FOLDER/vsfm.nvm ... done
 Save /$PATH_TO_IMAGE_FOLDER/vsfm.0.ply ...done
 
@@ -31,7 +30,8 @@ VisualSFM 3D reconstruction, finished
 Totally 15.000 seconds used
 
 LogFile: /opt/code/vsfm/bin/log/[20_12_17][15_26_12][690].log
-##################################
+'''
+
 The 3D model was stored as point cloud in ply format at /$PATH_TO_IMAGE_FOLDER/vsfm.0.ply.
 
 
