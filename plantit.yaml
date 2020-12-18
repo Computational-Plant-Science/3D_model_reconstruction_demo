@@ -3,13 +3,19 @@ author: Suxing Liu
 image: docker://computationalplantscience/3d-model-reconstruction
 public: True
 clone: False
-from_directory: True
-from:
-to:
 commands: /opt/code/vsfm/bin/VisualSFM sfm+pmvs "$INPUT" "$OUTPUT"
 mount:
 - /opt/code/vsfm/bin/temp
 - /opt/code/vsfm/bin/log
+input:
+  path:
+  kind: directory
+output:
+  path:
+  include:
+    patterns:
+      - nvm
+      - ply
 logo: Root3D.png
 resources:
   time: "12:00:00"
