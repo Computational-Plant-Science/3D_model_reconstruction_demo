@@ -10,7 +10,7 @@ mount:
 input:
   path:
   kind: directory
-  patterns:
+  filetypes:
     - jpg
     - png
 output:
