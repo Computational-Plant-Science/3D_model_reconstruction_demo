@@ -10,6 +10,9 @@ mount:
 input:
   path:
   kind: directory
+  patterns:
+    - jpg
+    - png
 output:
   path:
   include:
