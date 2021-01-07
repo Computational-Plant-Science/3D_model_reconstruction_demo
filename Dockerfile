@@ -1,6 +1,6 @@
-FROM ubuntu:16.04
+FROM python:3.7.9-buster
 
-LABEL maintainer="Chris Cotter, Suxing Liu, Wes Bonelli"
+LABEL maintainer="Suxing Liu, Wes Bonelli"
 
 RUN mkdir -p /opt/code
 COPY / /opt/code
@@ -9,7 +9,7 @@ RUN apt update && \
     apt install -y \
     wget \
     build-essential \
-    python3 \
+    # python3 \
     unzip \
     glew-utils \
     imagemagick \
@@ -45,6 +45,6 @@ RUN mkdir -p /opt/code/vsfm/bin/log && \
     touch /opt/code/vsfm/bin/temp/temp.pgm && \
     touch /opt/code/vsfm/bin/temp/temp.sift.sift && \
     ln -s /opt/code/vsfm/bin/temp/temp.pgm /opt/code/vsfm/bin/temp.pgm && \
-    ln -s /opt/code/vsfm/bin/temp/temp.sift.sift /opt/code/vsfm/bin/temp.sift.sift && \
+    ln -s /opt/code/vsfm/bin/temp/temp.sift.sift /opt/code/vsfaobfsqqd2TBToQ3Vm/bin/temp.sift.sift && \
     ln -s /opt/code/vsfm/bin/temp/log /opt/code/vsfm/bin/log
 
