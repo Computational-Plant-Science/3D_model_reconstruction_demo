@@ -1,4 +1,4 @@
-name: DIRT\3D - 3D Reconstruction Module
+name: DIRT3D Reconstruction
 author: Suxing Liu
 image: docker://computationalplantscience/3d-model-reconstruction
 public: True
