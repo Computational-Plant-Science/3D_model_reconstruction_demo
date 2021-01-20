@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-LABEL maintainer="Chris Cotter, Suxing Liu, Wes Bonelli"
+LABEL maintainer="Suxing Liu, Wes Bonelli"
 
 RUN mkdir -p /opt/code
 COPY / /opt/code
@@ -9,6 +9,8 @@ RUN apt update && \
     apt install -y \
     wget \
     build-essential \
+    python3-setuptools \
+    python3-pip \
     python3 \
     unzip \
     glew-utils \

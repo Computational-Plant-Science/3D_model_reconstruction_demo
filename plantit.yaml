@@ -1,4 +1,4 @@
-name: DIRT\3D - 3D Reconstruction Module
+name: DIRT3D Reconstruction
 author: Suxing Liu
 image: docker://computationalplantscience/3d-model-reconstruction
 public: True
@@ -20,8 +20,9 @@ output:
       - nvm
       - ply
 logo: Root3D.png
+gpu: True
 resources:
-  time: "12:00:00"
-  mem: "40GB"
+  time: "48:00:00"
+  mem: "20GB"
   tasks: 1
-  cores: 10
+  cores: 1
