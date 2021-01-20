@@ -10,18 +10,18 @@ vsfm/bin/libsiftgpu.so: vsfm
 	cp $(ROOT_DIR)/SiftGPU-master/bin/libsiftgpu.so $(ROOT_DIR)/vsfm/bin
 
 vsfm/bin/sift: vsfm
-	#wget http://www.vlfeat.org/download/vlfeat-0.9.19-bin.tar.gz
-	#tar xzf vlfeat-0.9.19-bin.tar.gz
-	#cp $(ROOT_DIR)/vlfeat-0.9.19/bin/glnxa64/* $(ROOT_DIR)/vsfm/bin/
+	wget http://www.vlfeat.org/download/vlfeat-0.9.19-bin.tar.gz
+	tar xzf vlfeat-0.9.19-bin.tar.gz
+	cp $(ROOT_DIR)/vlfeat-0.9.19/bin/glnxa64/* $(ROOT_DIR)/vsfm/bin/
 
-	wget http://www.vlfeat.org/download/vlfeat-0.9.19.tar.gz
-	tar xzf vlfeat-0.9.19.tar.gz
-	make -C vlfeat-0.9.19
-	cp $(ROOT_DIR)/vlfeat-0.9.19/bin/glnxa64/sift $(ROOT_DIR)/vsfm/bin/
-	cp $(ROOT_DIR)/vlfeat-0.9.19/bin/glnxa64/aib $(ROOT_DIR)/vsfm/bin/
-	cp $(ROOT_DIR)/vlfeat-0.9.19/bin/glnxa64/mser $(ROOT_DIR)/vsfm/bin/
-	cp $(ROOT_DIR)/vlfeat-0.9.19/bin/glnxa64/libvl.so $(ROOT_DIR)/vsfm/bin
-	rm vlfeat-0.9.19.tar.gz
+	#wget http://www.vlfeat.org/download/vlfeat-0.9.19.tar.gz
+	#tar xzf vlfeat-0.9.19.tar.gz
+	#make -C vlfeat-0.9.19
+	#cp $(ROOT_DIR)/vlfeat-0.9.19/bin/glnxa64/sift $(ROOT_DIR)/vsfm/bin/
+	#cp $(ROOT_DIR)/vlfeat-0.9.19/bin/glnxa64/aib $(ROOT_DIR)/vsfm/bin/
+	#cp $(ROOT_DIR)/vlfeat-0.9.19/bin/glnxa64/mser $(ROOT_DIR)/vsfm/bin/
+	#cp $(ROOT_DIR)/vlfeat-0.9.19/bin/glnxa64/libvl.so $(ROOT_DIR)/vsfm/bin
+	#rm vlfeat-0.9.19.tar.gz
 
 vsfm:
 	wget http://ccwu.me/vsfm/download/VisualSFM_linux_64bit.zip
@@ -40,6 +40,7 @@ vsfm/bin/libpba.so: vsfm
 	#make
 	#cp /opt/vsfm/pba/bin/libpba.so /optvsfm/bin/
 	#WITHOUT CUDA
+	
 	mv pba/makefile pba/makefile_with_gpu
 	mv pba/makefile_no_gpu pba/makefile
 	patch pba/makefile patches/pba_non_native.patch
