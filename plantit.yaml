@@ -1,6 +1,6 @@
 name: DIRT3D Reconstruction
 author: Suxing Liu
-image: docker://computationalplantscience/3d-model-reconstruction
+image: docker://computationalplantscience/3d-model-reconstruction:cuda
 public: True
 clone: False
 commands: /opt/code/vsfm/bin/VisualSFM sfm+pmvs "$INPUT" "$OUTPUT"
