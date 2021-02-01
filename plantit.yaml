@@ -22,7 +22,7 @@ output:
 logo: Root3D.png
 gpu: True
 resources:
-  time: "48:00:00"
+  time: "24:00:00"
   mem: "20GB"
-  tasks: 1
-  cores: 1
+  processes: 1
+  cores: 12
