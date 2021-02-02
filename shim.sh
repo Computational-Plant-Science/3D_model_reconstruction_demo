@@ -1,4 +1,4 @@
 #!/bin/bash
 
 /vsfm/bin/VisualSFM sfm+pmvs "$1" .
-mv "$1/*.ply" .
+find "$1" -name "*.ply" -exec mv '{}' . \;
