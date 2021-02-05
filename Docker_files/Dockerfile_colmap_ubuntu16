@@ -1,0 +1,56 @@
+FROM ubuntu:16.04
+
+# Get dependencies
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  cmake \
+  build-essential \
+  graphviz \
+  git \
+  coinor-libclp-dev \
+  libceres-dev \
+  libjpeg-dev \
+  libpng-dev \
+  libtiff-dev \
+  libxi-dev \
+  libxinerama-dev \
+  libxcursor-dev \
+  libxxf86vm-dev; \
+  apt-get autoclean && apt-get clean
+
+# Boost
+RUN apt-get -y install libboost-iostreams-dev libboost-program-options-dev libboost-system-dev libboost-serialization-dev
+
+# CGAL
+#RUN apt-get -y install libcgal-dev libcgal-qt5-dev
+
+#GLFW3 (Optional)
+#RUN apt-get -y install freeglut3-dev libglew-dev libglfw3-dev
+
+# Install COLMAP dependencies
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
+  libboost-program-options-dev \
+  libboost-filesystem-dev \
+  libboost-graph-dev \
+  libboost-regex-dev \
+  libboost-system-dev \
+  libboost-test-dev \
+  libeigen3-dev \
+  libsuitesparse-dev \
+  libfreeimage-dev \
+  libgoogle-glog-dev \
+  libgflags-dev \
+  libglew-dev \
+  qtbase5-dev \
+  libqt5opengl5-dev
+  
+# Build latest COLMAP
+RUN git clone https://github.com/colmap/colmap.git --branch dev; \
+  mkdir comap_build && cd comap_build; \
+  cmake . ../colmap -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX="/opt"; \
+  make -j4 && make install; \
+  cd .. && rm -rf comap_build
+
+
+# Add binaries to path
+ENV PATH $PATH:/opt/bin
