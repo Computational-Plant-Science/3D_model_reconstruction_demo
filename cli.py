@@ -30,7 +30,11 @@ def run(path, gpu):
     sparse_model = "colmap mapper --database_path " + path + "/database.db " + "--image_path " + path + " --output_path " + path + "/sparse"
     subprocess.run(sparse_model, shell=True)
 
-    nvm_model = "colmap model_converter --input_path " + file_path + "/sparse/0 " + " --output_path " + file_path + "/model.nvm " + " --output_type NVM"
+    nvm_model = "colmap model_converter --input_path " + path + "/sparse/0 " + " --output_path " + path + "/model.nvm " + " --output_type NVM"
     subprocess.run(nvm_model, shell=True)
 
     # dense_model = "/opt/code/vsfm/bin/VisualSFM sfm+loadnvm+pmvs " + file_path + "/model.nvm " + file_path + "/dense.nvm "
+
+
+if __name__ == '__main__':
+    cli()
