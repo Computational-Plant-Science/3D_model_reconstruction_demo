@@ -2,6 +2,7 @@ numpy
 scipy
 matplotlib
 psutil
-PIL
+Pillow
 scikit-image
 opencv-contrib-python
+click
