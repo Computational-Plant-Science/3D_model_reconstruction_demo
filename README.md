@@ -8,7 +8,7 @@ The software package was also available at Dockerhub (https://hub.docker.com/r/c
 This software can be run by docker container, users do not need to install many libraries and compile complex source files. 
  
 # Setup Docker container
-########################################################################
+
 1. OS requirements
 
     To install Docker container (https://docs.docker.com/engine/install/ubuntu/): 
@@ -65,84 +65,84 @@ This software can be run by docker container, users do not need to install many 
 
     $ sudo docker run hello-world
     
-#Steps to run this container by building it locally:
-########################################################################
+# Run this container by building it locally:
 
-# Clone source code to your local path
-   $ git clone https://github.com/Computational-Plant-Science/3D_model_reconstruction_demo.git
+    # Clone source code to your local path
+    $ git clone https://github.com/Computational-Plant-Science/3D_model_reconstruction_demo.git
    
-   # Enter into the source code folder named as "cd 3D_model_reconstruction_demo"
-   $ cd 3D_model_reconstruction_demo/
+    # Enter into the source code folder named as "cd 3D_model_reconstruction_demo"
+    $ cd 3D_model_reconstruction_demo/
    
-   # Build docker container locally named as "3d_model_reconstruction" using "Dockerfile" in the same folder, note: docker repository name must be lowercase.
-   $ docker build -t 3d_model_reconstruction -f Dockerfile .
+    # Build docker container locally named as "3d_model_reconstruction" using "Dockerfile" in the same folder, note: docker repository name must be lowercase.
+    $ docker build -t 3d_model_reconstruction -f Dockerfile .
    
-   # Run the docker container by linking docker container data path to user's image data folder local path
-   # Note: please replace $path_to_image_folder as your local image data folder path, 
-   # Suggest to check your image folder path using "pwd" command
-   # Example: $ docker run -v /home/suxing/example/root_images:/images -it 3d_model_reconstruction
+    # Run the docker container by linking docker container data path to user's image data folder local path
+    # Note: please replace $path_to_image_folder as your local image data folder path, 
+    # Suggest to check your image folder path using "pwd" command
+    # Example: $ docker run -v /home/suxing/example/root_images:/images -it 3d_model_reconstruction
    
-   $ docker run -v /$path_to_image_folder:/images -it 3d_model_reconstruction
+    $ docker run -v /$path_to_image_folder:/images -it 3d_model_reconstruction
    
-   # After launch the docker container, run "pipeline.sh" or "pipeline.sh" insider the container
-   $ root@0529cde0b988:/opt/code# ./pipeline.sh
-   or $ root@0529cde0b988:/opt/code# python3 pipeline.py
+    # After launch the docker container, run "pipeline.sh" or "pipeline.sh" insider the container
+    $ root@0529cde0b988:/opt/code# ./pipeline.sh
+    or $ root@0529cde0b988:/opt/code# python3 pipeline.py
 
-   # Get 3d model result named as "dense.0.ply"
-   After the container was executed successfully with image data files, user should be able to see output in your command window like this:
-   '''
-   Loading option-0000.ply, 48656 vertices ...
-   Save to /images/dense.nvm ... done
-   Save /images/dense.0.ply ...done
-   ----------------------------------------------------------------
-   VisualSFM 3D reconstruction, finished
-   Totally 23.000 seconds used
-   
-   The 3D model file was in ply format, it is located inside your image folder, its name is "dense.0.ply".
-   path = "/$path_to_image_folder/dense.0.ply"
-
-
-## Author
-suxing liu(suxingliu@gmail.com)
-
-Reference:
-VisualSFM
-[Anders Damsgaard](mailto:adamsgaard@ucsd.edu) with contributions by Caleb Adams and Connor P Doherty.
-Changchang Wu ( wucc1130@gmail.com )
-+ Structure from Motion
-[1] Changchang Wu, "Towards Linear-time Incremental Structure From Motion", 3DV 2013
-[2] Changchang Wu, "VisualSFM: A Visual Structure from Motion System", http://ccwu.me/vsfm/, 2011
-+ Bundle Adjustment
-[3] Changchang Wu, Sameer Agarwal, Brian Curless, and Steven M. Seitz, "Multicore Bundle Adjustment", CVPR 2011   
-+ Feature Detection
-[4] Changchang Wu, "SiftGPU: A GPU implementation of Scale Invaraint Feature Transform (SIFT)", http://cs.unc.edu/~ccwu/siftgpu, 2007
-
-COLMAP
-https://colmap.github.io
-Author: Johannes L. Schoenberger (jsch-at-demuc-dot-de)
-@inproceedings{schoenberger2016sfm,
-    author={Sch\"{o}nberger, Johannes Lutz and Frahm, Jan-Michael},
-    title={Structure-from-Motion Revisited},
-    booktitle={Conference on Computer Vision and Pattern Recognition (CVPR)},
-    year={2016},
-}
-
-@inproceedings{schoenberger2016mvs,
-    author={Sch\"{o}nberger, Johannes Lutz and Zheng, Enliang and Pollefeys, Marc and Frahm, Jan-Michael},
-    title={Pixelwise View Selection for Unstructured Multi-View Stereo},
-    booktitle={European Conference on Computer Vision (ECCV)},
-    year={2016},
-}
+    # Get 3d model result named as "dense.0.ply"
+    # After the container was executed successfully with image data files, user should be able to see output in your command window like this:
+    '''
+    Loading option-0000.ply, 48656 vertices ...
+    Save to /images/dense.nvm ... done
+    Save /images/dense.0.ply ...done
+    ----------------------------------------------------------------
+    '''
+    The 3D model file was in ply format(https://en.wikipedia.org/wiki/PLY_(file_format)), it is located inside your image folder, its name is "dense.0.ply".
+    path = "/$path_to_image_folder/dense.0.ply"
+    
+    To visualize the 3d model file, suggest to install Meshlab(https://www.meshlab.net/) or cloudcompare(https://www.danielgm.net/cc/)
 
 
-Docker container was maintained by Wesley Paul Bonelli. it was deployed to Plant IT website by Wesley Paul Bonelli (wbonelli@uga.edu).
+# Author
+    suxing liu(suxingliu@gmail.com)
+    Wesley Paul Bonelli(wbonelli@uga.edu)
+    
+    Reference:
+    VisualSFM
+    [Anders Damsgaard](mailto:adamsgaard@ucsd.edu) with contributions by Caleb Adams and Connor P Doherty.
+    Changchang Wu ( wucc1130@gmail.com )
+    + Structure from Motion
+    [1] Changchang Wu, "Towards Linear-time Incremental Structure From Motion", 3DV 2013
+    [2] Changchang Wu, "VisualSFM: A Visual Structure from Motion System", http://ccwu.me/vsfm/, 2011
+    + Bundle Adjustment
+    [3] Changchang Wu, Sameer Agarwal, Brian Curless, and Steven M. Seitz, "Multicore Bundle Adjustment", CVPR 2011   
+    + Feature Detection
+    [4] Changchang Wu, "SiftGPU: A GPU implementation of Scale Invaraint Feature Transform (SIFT)", http://cs.unc.edu/~ccwu/siftgpu, 2007
 
-Singularity container overlay issues were solved by [Saravanaraj Ayyampalayam] (https://github.com/raj76) (mailto:raj76@uga.edu)
+    COLMAP
+    https://colmap.github.io
+    Author: Johannes L. Schoenberger (jsch-at-demuc-dot-de)
+    @inproceedings{schoenberger2016sfm,
+        author={Sch\"{o}nberger, Johannes Lutz and Frahm, Jan-Michael},
+        title={Structure-from-Motion Revisited},
+        booktitle={Conference on Computer Vision and Pattern Recognition (CVPR)},
+        year={2016},
+    }
 
-Special thanks to Chris Cotter building the container recipe for testing and debugging.
+    @inproceedings{schoenberger2016mvs,
+        author={Sch\"{o}nberger, Johannes Lutz and Zheng, Enliang and Pollefeys, Marc and Frahm, Jan-Michael},
+        title={Pixelwise View Selection for Unstructured Multi-View Stereo},
+        booktitle={European Conference on Computer Vision (ECCV)},
+        year={2016},
+    }
 
-## Todo
-- GPU cuda version container
 
-## License
-GNU Public License
+   Docker container was maintained by Wesley Paul Bonelli. it was deployed to Plant IT website by Wesley Paul Bonelli (wbonelli@uga.edu).
+
+   Singularity container overlay issues were solved by [Saravanaraj Ayyampalayam] (https://github.com/raj76) (mailto:raj76@uga.edu)
+
+   Special thanks to Chris Cotter building the container recipe for testing and debugging.
+
+   ## Todo
+   - GPU cuda version container
+
+   ## License
+   GNU Public License
