@@ -8,7 +8,7 @@ The software package was also available at Dockerhub (https://hub.docker.com/r/c
 This software can be run by docker container, users do not need to install many libraries and compile complex source files. 
  
 # Setup Docker container
-#########################################################################################################################
+########################################################################
 1. OS requirements
 
     To install Docker container (https://docs.docker.com/engine/install/ubuntu/): 
@@ -66,7 +66,7 @@ This software can be run by docker container, users do not need to install many 
     $ sudo docker run hello-world
     
 
-###############################################################################################################################################
+########################################################################
 Steps to run this container by building it locally:
  
 2. Run the container:
