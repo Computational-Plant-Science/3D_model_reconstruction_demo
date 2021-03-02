@@ -9,7 +9,7 @@ This software can be run by docker container, users do not need to install many 
  
 # Setup Docker container
 
-1. OS requirements
+OS requirements
 
     To install Docker container (https://docs.docker.com/engine/install/ubuntu/): 
 
