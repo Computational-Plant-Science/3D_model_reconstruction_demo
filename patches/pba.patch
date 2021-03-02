@@ -1,0 +1,12 @@
+diff -Naur pba/makefile_no_gpu pba.core2/makefile_no_gpu
+--- pba/makefile_no_gpu	2015-01-16 16:32:29.000000000 -0500
++++ pba.core2/makefile_no_gpu	2015-01-16 16:32:34.000000000 -0500
+@@ -15,7 +15,7 @@
+ OUT_PBA = ./bin/out_no_gpu
+ 
+ CC = g++
+-CFLAGS =  -DPBA_NO_GPU -fPIC -L/usr/lib64 -L/usr/lib -L$(BIN_DIR) -O2 -Wall -Wno-deprecated -pthread -march=native -mfpmath=sse -fpermissive
++CFLAGS =  -DPBA_NO_GPU -fPIC -L/usr/lib64 -L/usr/lib -L$(BIN_DIR) -O2 -Wall -Wno-deprecated -pthread -march=core2 -mfpmath=sse -fpermissive
+ 
+ 
+ # siftgpu header files

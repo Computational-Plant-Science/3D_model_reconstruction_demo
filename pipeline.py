@@ -9,7 +9,7 @@ Author-email: suxingliu@gmail.com
 
 USAGE:
 
-python3 colmap_pipeline.py -p /Path2Image_folder/
+python3 colmap_pipeline.py 
 
 
 argument:
@@ -17,11 +17,8 @@ argument:
 
 
 Note:
-
 GPU related parameters
-
 --SiftExtraction.use_gpu 
-
 --SiftMatching.use_gpu
 
 """
@@ -74,7 +71,7 @@ def colmap_vsfm_pipeline(file_path):
     execute_script(nvm_model)
     
     dense_model = "/opt/code/vsfm/bin/VisualSFM sfm+loadnvm+pmvs " + file_path + "/model.nvm " + file_path + "/dense.nvm "
-
+    execute_script(dense_model)
     
     
     '''
@@ -103,13 +100,13 @@ if __name__ == '__main__':
 
     # construct the argument and parse the arguments
     ap = argparse.ArgumentParser()
-    ap.add_argument("-p", "--path", required = True,    help = "path to image file")
+    ap.add_argument("-p", "--path", required = False, default = '/images/', help = "path to image file")
     args = vars(ap.parse_args())
 
    
     # setting path to cross section image files
     file_path = args["path"]
-     
+    
    
     colmap_vsfm_pipeline(file_path)
     
