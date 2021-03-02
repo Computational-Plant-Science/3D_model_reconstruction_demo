@@ -65,14 +65,10 @@ This software can be run by docker container, users do not need to install many 
 
     $ sudo docker run hello-world
     
-
-########################################################################
-   
 #Steps to run this container by building it locally:
- 
-2. Run the container:
+########################################################################
 
-   # Clone source code to your local path
+# Clone source code to your local path
    $ git clone https://github.com/Computational-Plant-Science/3D_model_reconstruction_demo.git
    
    # Enter into the source code folder named as "cd 3D_model_reconstruction_demo"
