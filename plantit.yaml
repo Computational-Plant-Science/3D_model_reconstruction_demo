@@ -4,8 +4,8 @@ image: docker://computationalplantscience/3d-model-reconstruction
 public: True
 commands: python3 /opt/code/cli.py run "$INPUT"
 mount:
-- /vsfm/bin/temp
-- /vsfm/bin/log
+- /opt/code/vsfm/bin/temp
+- /opt/code/vsfm/bin/log
 input:
   path:
   kind: directory
