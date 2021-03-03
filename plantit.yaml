@@ -19,7 +19,7 @@ output:
       - nvm
       - ply
 logo: Root3D.png
-gpu: True
+gpu: False
 resources:
   time: "24:00:00"
   mem: "20GB"
