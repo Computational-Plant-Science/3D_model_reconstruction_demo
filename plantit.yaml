@@ -1,8 +1,8 @@
 name: DIRT3D Reconstruction
 author: Suxing Liu
-image: docker://computationalplantscience/3d-model-reconstruction:cuda
+image: docker://computationalplantscience/3d-model-reconstruction
 public: True
-commands: /vsfm/shim.sh "$INPUT"
+commands: python3 /opt/code/cli.py run "$INPUT" --gpu "$GPU"
 mount:
 - /vsfm/bin/temp
 - /vsfm/bin/log

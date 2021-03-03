@@ -35,7 +35,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libjpeg-turbo8 \
     libgsl-dev \
     freeglut3-dev \
-    dos2unix 
+    dos2unix
 
 
 
@@ -69,7 +69,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     qtbase5-dev \
     libcgal-dev \
     libcgal-qt5-dev \
-    libqt5opengl5-dev
+    libqt5opengl5-dev \
+    python3-setuptools \
+    python3.8 \
+    python3.8-distutils
 
 
 #GLFW3 (Optional)
@@ -139,3 +142,7 @@ RUN mkdir -p /opt/code/vsfm/bin/log && \
     ln -s /opt/code/vsfm/bin/temp/temp.pgm /opt/code/vsfm/bin/temp.pgm && \
     ln -s /opt/code/vsfm/bin/temp/temp.sift.sift /opt/code/vsfm/bin/temp.sift.sift && \
     ln -s /opt/code/vsfm/bin/temp/log /opt/code/vsfm/bin/log
+
+RUN python3.8 -m easy_install pip && \
+    python3.8 -m pip install --upgrade pip && \
+    python3.8 -m pip install -r /opt/code/requirements.txt
