@@ -1,8 +1,8 @@
 FROM ubuntu:20.04
 
-RUN mkdir -p /vsfm/bin && \
-    cp -r /root/vsfm / && \
-    chmod -R a+rwx /vsfm
+# RUN mkdir -p /vsfm/bin && \
+#     cp -r /root/vsfm / && \
+#     chmod -R a+rwx /vsfm
 
 #setup working directory
 RUN mkdir -p /opt/code/
@@ -37,9 +37,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libjpeg-turbo8 \
     libgsl-dev \
     freeglut3-dev \
-    dos2unix 
-
-
+    dos2unix \
+    python3-pip \
+    python3-setuptools
 
 # Get dependencies for colmap
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -141,3 +141,6 @@ RUN mkdir -p /opt/code/vsfm/bin/log && \
     ln -s /opt/code/vsfm/bin/temp/temp.pgm /opt/code/vsfm/bin/temp.pgm && \
     ln -s /opt/code/vsfm/bin/temp/temp.sift.sift /opt/code/vsfm/bin/temp.sift.sift && \
     ln -s /opt/code/vsfm/bin/temp/log /opt/code/vsfm/bin/log
+
+RUN python3.8 -m pip install --upgrade pip && \
+    python3.8 -m pip install -r /opt/code/requirements.txt
