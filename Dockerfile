@@ -76,8 +76,19 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 
 
 #GLFW3 (Optional)
-#RUN apt-get -y install freeglut3-dev libglew-dev libglfw3-dev
+RUN apt-get -y install freeglut3-dev libglew-dev libglfw3-dev
 
+# Build and install ceres solver
+RUN apt-get -y install \
+    libatlas-base-dev \
+    libsuitesparse-dev
+RUN git clone https://github.com/ceres-solver/ceres-solver.git --branch 1.14.0
+RUN cd ceres-solver && \
+	mkdir build && \
+	cd build && \
+	cmake .. -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF && \
+	make -j4 && \
+	make install
 
 # Build latest COLMAP
 RUN git clone https://github.com/colmap/colmap.git --branch dev
