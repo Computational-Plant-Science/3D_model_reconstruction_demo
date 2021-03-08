@@ -79,8 +79,8 @@ Maintainer: Suxing Liu, Wes Bonelli
 	mkdir build
 	cd build
 	cmake .. -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF
-	#make
-	make -j20
+	make
+	#make -j20
 	make install
 	
 	cd ../..
@@ -94,7 +94,7 @@ Maintainer: Suxing Liu, Wes Bonelli
 #    -DCMAKE_FIND_LIBRARY_SUFFIXES=".a" ..
 	cmake ../
 	#make -j20
-	make -j20
+	#make -j20
 	make install
 
     # Install VisualSFM
