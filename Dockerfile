@@ -35,7 +35,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libjpeg-turbo8 \
     libgsl-dev \
     freeglut3-dev \
-    dos2unix 
+    dos2unix
 
 
 
@@ -69,12 +69,26 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     qtbase5-dev \
     libcgal-dev \
     libcgal-qt5-dev \
-    libqt5opengl5-dev
+    libqt5opengl5-dev \
+    python3-setuptools \
+    python3.8 \
+    python3.8-distutils
 
 
 #GLFW3 (Optional)
-#RUN apt-get -y install freeglut3-dev libglew-dev libglfw3-dev
+RUN apt-get -y install freeglut3-dev libglew-dev libglfw3-dev
 
+# Build and install ceres solver
+RUN apt-get -y install \
+    libatlas-base-dev \
+    libsuitesparse-dev
+RUN git clone https://github.com/ceres-solver/ceres-solver.git --branch 1.14.0
+RUN cd ceres-solver && \
+	mkdir build && \
+	cd build && \
+	cmake .. -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF && \
+	make -j4 && \
+	make install
 
 # Build latest COLMAP
 RUN git clone https://github.com/colmap/colmap.git --branch dev
@@ -139,3 +153,7 @@ RUN mkdir -p /opt/code/vsfm/bin/log && \
     ln -s /opt/code/vsfm/bin/temp/temp.pgm /opt/code/vsfm/bin/temp.pgm && \
     ln -s /opt/code/vsfm/bin/temp/temp.sift.sift /opt/code/vsfm/bin/temp.sift.sift && \
     ln -s /opt/code/vsfm/bin/temp/log /opt/code/vsfm/bin/log
+
+RUN python3.8 -m easy_install pip && \
+    python3.8 -m pip install --upgrade pip && \
+    python3.8 -m pip install -r /opt/code/requirements.txt
