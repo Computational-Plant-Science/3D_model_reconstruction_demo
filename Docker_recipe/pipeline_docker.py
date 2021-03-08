@@ -61,8 +61,8 @@ def colmap_vsfm_pipeline(file_path):
     feature_matching = "colmap exhaustive_matcher --database_path " + file_path + "/database.db" + " --SiftMatching.use_gpu=false"
     execute_script(feature_matching)
     
-    #create_folder_sparse = "mkdir " + file_path + "/sparse" 
-    #execute_script(create_folder_sparse)
+    create_folder_sparse = "mkdir " + file_path + "/sparse" 
+    execute_script(create_folder_sparse)
     
     sparse_model = "colmap mapper --database_path " + file_path + "/database.db " + "--image_path " + file_path + " --output_path " + file_path + "/sparse" 
     execute_script(sparse_model)
@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     # construct the argument and parse the arguments
     ap = argparse.ArgumentParser()
-    ap.add_argument("-p", "--path", required = False, default = '/srv/images', help = "path to image file")
+    ap.add_argument("-p", "--path", required = False, default = '/images/', help = "path to image file")
     args = vars(ap.parse_args())
 
    

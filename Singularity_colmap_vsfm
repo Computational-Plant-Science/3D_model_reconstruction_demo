@@ -1,0 +1,193 @@
+Bootstrap: docker
+From: ubuntu:20.04
+
+%labels
+Maintainer: Suxing Liu, Wes Bonelli
+
+#########
+#%setup
+    mkdir ${SINGULARITY_ROOTFS}/srv/images
+    mkdir ${SINGULARITY_ROOTFS}/srv/images/sparse
+    mkdir ${SINGULARITY_ROOTFS}/srv/images/sparse/0
+    
+    mkdir ${SINGULARITY_ROOTFS}/opt/code/
+#########
+
+%files
+    ./* /opt/code
+
+##Just grabbing default packages from ubuntu repository
+%post
+	apt-get -ym update
+	DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    git \
+    wget \
+    cmake \
+    tzdata \
+    build-essential \
+    libboost-program-options-dev \
+    libboost-filesystem-dev \
+    libboost-graph-dev \
+    libboost-regex-dev \
+    libboost-system-dev \
+    libboost-test-dev \
+    libeigen3-dev \
+    libsuitesparse-dev \
+    libfreeimage-dev \
+    libgoogle-glog-dev \
+    libgflags-dev \
+    libglew-dev \
+    qtbase5-dev \
+    libqt5opengl5-dev \
+    libcgal-dev
+    
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    unzip \
+    nano \
+    glew-utils \
+    imagemagick \
+    libgtk2.0-dev \
+    libglew-dev \
+    libdevil-dev \
+    libboost-all-dev \
+    libatlas-cpp-0.6-dev \
+    libatlas-base-dev \
+    libatlas3-base \
+    liblapack3 \
+    libblas3 \
+    libblas-dev \
+    libcminpack-dev \
+    libgfortran5 \
+    libmetis-edf-dev \
+    libparmetis-dev \
+    libjpeg-turbo8 \
+    libgsl-dev \
+    freeglut3-dev \
+    dos2unix 
+    
+    #apt-get -ym install libcgal-qt5-dev
+    
+    apt-get -ym install libatlas-base-dev libsuitesparse-dev
+    
+    
+    git clone https://ceres-solver.googlesource.com/ceres-solver
+    git clone https://github.com/colmap/colmap.git
+    
+    # Install ceres-solver
+    cd ceres-solver
+	git checkout $(git describe --tags) # Checkout the latest release
+	mkdir build
+	cd build
+	cmake .. -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF
+	#make
+	make -j20
+	make install
+	
+	cd ../..
+    
+    # Install colmap
+	cd colmap
+	git checkout master
+	mkdir build
+	cd build
+#	cmake -DCMAKE_EXE_LINKER_FLAGS="-static -ldl -lc" \
+#    -DCMAKE_FIND_LIBRARY_SUFFIXES=".a" ..
+	cmake ../
+	#make -j20
+	make -j20
+	make install
+
+    # Install VisualSFM
+	cd /opt/code/
+	wget http://ccwu.me/vsfm/download/VisualSFM_linux_64bit.zip
+	unzip VisualSFM_linux_64bit.zip
+	rm VisualSFM_linux_64bit.zip
+	cd vsfm
+	sed -i 's/LIB_LIST +=/LIB_LIST += -no-pie /' /opt/code/vsfm/makefile
+	make
+
+
+	# Install SiftGPU
+	cd /opt/code/
+	wget https://github.com/pitzer/SiftGPU/archive/master.zip
+	unzip master.zip
+	rm  master.zip
+	mv SiftGPU-master SiftGPU
+	#cp patches/siftgpu.patch /opt/code/SiftGPU/siftgpu.patch
+	cd /opt/code/SiftGPU
+	#patch -p0 < siftgpu.patch
+	make
+	cp /opt/code/SiftGPU/bin/libsiftgpu.so /opt/code/vsfm/bin
+
+
+	# Install PBA
+	cd /opt/code/
+	wget http://grail.cs.washington.edu/projects/mcba/pba_v1.0.5.zip 
+	unzip pba_v1.0.5.zip
+	rm pba_v1.0.5.zip
+	cd /opt/code/pba
+	dos2unix makefile_no_gpu
+	make -f makefile_no_gpu
+	cp -v /opt/code/pba/bin/libpba_no_gpu.so /opt/code/vsfm/bin/libpba.so
+
+
+	#Install CMVS-PMVS
+	cd /opt/code/
+	wget https://github.com/pmoulon/CMVS-PMVS/archive/master.zip 
+	unzip master.zip
+	rm master.zip
+	mv CMVS-PMVS-master CMVS-PMVS
+	mkdir -p /opt/code/CMVS-PMVS/program/build
+	cd /opt/code/CMVS-PMVS/program/build
+	cmake ..
+	make install 
+	cp /opt/code/CMVS-PMVS/program/build/main/cmvs /opt/code/vsfm/bin/
+	cp /opt/code/CMVS-PMVS/program/build/main/pmvs2 /opt/code/vsfm/bin/
+	cp /opt/code/CMVS-PMVS/program/build/main/genOption /opt/code/vsfm/bin/
+
+
+	# Install Graclus
+	cd /opt/code/
+	wget http://www.cs.utexas.edu/users/dml/Software/graclus1.2.tar.gz 
+	tar xzf graclus1.2.tar.gz
+	rm graclus1.2.tar.gz 
+	#cp patches/graclus.patch /opt/code/graclus1.2/graclus.patch
+	sed -i 's/COPTIONS = -DNUMBITS=32/COPTIONS = -DNUMBITS=64/' /opt/code/graclus1.2/Makefile.in
+	cd /opt/code/graclus1.2
+	#patch -p0 < graclus.patch
+	make
+
+
+	# Install vlfeat
+	cd /opt/code/
+	wget http://www.vlfeat.org/download/vlfeat-0.9.19-bin.tar.gz 
+	tar xzf vlfeat-0.9.19-bin.tar.gz
+	rm vlfeat-0.9.19-bin.tar.gz
+	cp -v /opt/code/vlfeat-0.9.19/bin/glnxa64/* /opt/code/vsfm/bin/
+
+	# Add configuration file
+	cp config/nv.ini /opt/code/vsfm/bin/nv.ini
+
+	
+	mkdir /lscratch /db /work /scratch
+  
+    chmod -R a+rwx /opt/code
+  
+    mkdir -p /opt/code/vsfm/bin/log && \
+    mkdir -p /opt/code/vsfm/bin/temp/log && \
+    touch /opt/code/vsfm/bin/temp/temp.pgm && \
+    touch /opt/code/vsfm/bin/temp/temp.sift.sift && \
+    ln -s /opt/code/vsfm/bin/temp/temp.pgm /opt/code/vsfm/bin/temp.pgm && \
+    ln -s /opt/code/vsfm/bin/temp/temp.sift.sift /opt/code/vsfm/bin/temp.sift.sift && \
+    ln -s /opt/code/vsfm/bin/temp/log /opt/code/vsfm/bin/log
+
+
+%environment
+	PATH=$PATH:/opt/code/vsfm/bin/
+    export PATH
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/code/vsfm/bin/
+    export LD_LIBRARY_PATH
+    
+%runscript
+    /opt/code/vsfm/bin/VisualSFM "$@"
+
