@@ -181,6 +181,8 @@ Maintainer: Suxing Liu, Wes Bonelli
     ln -s /opt/code/vsfm/bin/temp/temp.sift.sift /opt/code/vsfm/bin/temp.sift.sift && \
     ln -s /opt/code/vsfm/bin/temp/log /opt/code/vsfm/bin/log
 
+    strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so
+
 
 %environment
 	PATH=$PATH:/opt/code/vsfm/bin/
