@@ -13,4 +13,5 @@ pmvs-2/program/main/pmvs2
 *.simg
 *.sif
 *.img
-data
+data*
+*.log
