@@ -14,6 +14,9 @@ RUN apt-get -ym update && \
     cmake \
     tzdata \
     build-essential \
+    python3-pip \
+    python3 \
+    python3-setuptools \
     libboost-program-options-dev \
     libboost-filesystem-dev \
     libboost-graph-dev \
@@ -148,6 +151,9 @@ RUN mkdir -p /opt/code/vsfm/bin/log && \
 
 # PyQt bug fix
 RUN strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so
+
+RUN pip3 install --upgrade pip && \
+    pip3 install -r /opt/code/requirements.txt
 
 # Set environment variables
 ENV PATH=$PATH:/opt/code/vsfm/bin/

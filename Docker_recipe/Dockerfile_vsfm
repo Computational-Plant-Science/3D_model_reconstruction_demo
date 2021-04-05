@@ -40,6 +40,9 @@ RUN cd /opt/code && \
     mkdir /lscratch /db /work /scratch && \
     chmod -R a+rwx /opt/code
 
+RUN pip3 install --upgrade pip && \
+    pip3 install -r /opt/code/requirements.txt
+
 ENV PATH=$PATH:/opt/code/vsfm/bin/
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/code/vsfm/bin/
 
