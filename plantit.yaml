@@ -2,7 +2,7 @@ name: DIRT3D Reconstruction
 author: Suxing Liu
 image: docker://computationalplantscience/3d-model-reconstruction
 public: True
-commands: python3 /opt/code/cli.py run "$INPUT"
+commands: python3 /opt/code/cli.py run "$INPUT" -o $(dirname $INPUT)
 mount:
 - /opt/code/vsfm/bin/temp
 - /opt/code/vsfm/bin/log
@@ -19,7 +19,7 @@ output:
       - nvm
       - ply
 logo: Root3D.png
-gpu: False
+gpu: True
 resources:
   time: "24:00:00"
   mem: "20GB"
