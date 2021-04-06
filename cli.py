@@ -31,7 +31,7 @@ def run(source, output_directory, gpu):
     subprocess.run(f"colmap exhaustive_matcher --database_path {database} --SiftMatching.use_gpu={gpu}", shell=True)
 
     # sparse model
-    subprocess.run(f"mkdir {source}/sparse", shell=True)
+    subprocess.run(f"mkdir {join(output_directory, 'sparse')}", shell=True)
     subprocess.run(f"colmap mapper --database_path {database} --image_path {source} --output_path {join(output_directory, 'sparse')}", shell=True)
 
     # NVM model
