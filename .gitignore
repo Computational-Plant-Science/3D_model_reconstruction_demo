@@ -14,5 +14,6 @@ pmvs-2/program/main/pmvs2
 *.sif
 *.img
 data*
+data_big
 output
 *.log

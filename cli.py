@@ -16,26 +16,26 @@ def cli():
 @click.argument('source')
 @click.option('-o', '--output_directory', required=True, type=str, default='')
 @click.option('--gpu', required=False, type=bool, default=False)
-def run(source, output_directory, gpu):
+def reconstruct(source, output_directory, gpu):
     if not os.path.exists(source):
         raise ValueError("Path does not exist!")
 
     start = time.time()
-
     database = join(output_directory, 'database.db')
 
     # feature extraction
-    subprocess.run(f"colmap feature_extractor --image_path {source} --database_path {database} --SiftExtraction.use_gpu={gpu}", shell=True)
+    subprocess.run(f"colmap feature_extractor --image_path {source} --database_path {database} --SiftExtraction.use_gpu={gpu} --SiftExtraction.num_threads=2 --SiftExtraction.first_octave 0", shell=True)
 
     # feature matching
     subprocess.run(f"colmap exhaustive_matcher --database_path {database} --SiftMatching.use_gpu={gpu}", shell=True)
 
     # sparse model
-    subprocess.run(f"mkdir {join(output_directory, 'sparse')}", shell=True)
-    subprocess.run(f"colmap mapper --database_path {database} --image_path {source} --output_path {join(output_directory, 'sparse')}", shell=True)
+    sparse = join(output_directory, 'sparse')
+    subprocess.run(f"mkdir {sparse}", shell=True)
+    subprocess.run(f"colmap mapper --database_path {database} --image_path {source} --output_path {sparse}", shell=True)
 
     # NVM model
-    subprocess.run(f"colmap model_converter --input_path {join(output_directory, 'sparse', '0')} --output_path {join(output_directory, 'model.nvm')} --output_type NVM", shell=True)
+    subprocess.run(f"colmap model_converter --input_path {join(sparse, '0')} --output_path {join(output_directory, 'model.nvm')} --output_type NVM", shell=True)
 
     # dense model
     subprocess.run(f"/opt/code/vsfm/bin/VisualSFM sfm+loadnvm+pmvs {join(output_directory, 'model.nvm')} {join(output_directory, 'dense.nvm')}", shell=True)
