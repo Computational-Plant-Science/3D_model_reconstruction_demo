@@ -7,6 +7,10 @@ The software package was also available at Dockerhub (https://hub.docker.com/r/c
 
 This software can be run by docker container, users do not need to install many libraries and compile complex source files. 
  
+Following was the demo of the comparision of real root and reconstructed 3D model model.
+
+![Optional Text](../master/media/ProjectDemo.gif)
+ 
 # Setup Docker container
 
 OS requirements
