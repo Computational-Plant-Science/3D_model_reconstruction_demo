@@ -83,20 +83,19 @@ OS requirements
     # Run the docker container by linking docker container data path to user's image data folder local path
     # Note: please replace $path_to_image_folder as your local image data folder path, 
     # Suggest to check your image folder path using "pwd" command
-    # Example: $ docker run -v /home/suxing/example/root_images:/images -it 3d_model_reconstruction
+    # Example: $ docker run -v /home/suxing/example/root_images:/srv/images -it 3d_model_reconstruction
    
-    $ docker run -v /$path_to_image_folder:/images -it 3d_model_reconstruction
+    $ docker run -v /$path_to_image_folder:/srv/images -it 3d_model_reconstruction
    
     # After launch the docker container, run "pipeline.sh" or "pipeline.sh" insider the container
-    $ root@0529cde0b988:/opt/code# ./pipeline.sh
-    or $ root@0529cde0b988:/opt/code# python3 pipeline.py
+    $ root@.....:/opt/code# python3 pipeline.py
 
     # Get 3d model result named as "dense.0.ply"
     # After the container was executed successfully with image data files, user should be able to see output in your command window like this:
     '''
     Loading option-0000.ply, 48656 vertices ...
-    Save to /images/dense.nvm ... done
-    Save /images/dense.0.ply ...done
+    Save to /srv/images/dense.nvm ... done
+    Save /srv/images/dense.0.ply ...done
     ----------------------------------------------------------------
     '''
     The 3D model file was in ply format(https://en.wikipedia.org/wiki/PLY_(file_format)), it is located inside your image folder, its name is "dense.0.ply".
