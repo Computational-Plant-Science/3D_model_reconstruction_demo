@@ -18,7 +18,7 @@ output:
     patterns:
       - nvm
       - ply
-logo: Root3D.png
+logo: media/Root3D.png
 gpu: True
 resources:
   time: "24:00:00"
