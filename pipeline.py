@@ -9,7 +9,7 @@ Author-email: suxingliu@gmail.com
 
 USAGE:
 
-python3 colmap_pipeline.py 
+python3 pipeline.py 
 
 
 argument:
