@@ -3,7 +3,8 @@ author: Suxing Liu
 image: docker://computationalplantscience/3d-model-reconstruction
 public: True
 commands: python3 /opt/code/cli.py reconstruct "$INPUT" -o $(dirname $INPUT) --gpu $GPU_MODE
-env: QT_QPA_PLATFORM=minimal
+env:
+- QT_QPA_PLATFORM=minimal
 mount:
 - /opt/code/vsfm/bin/temp
 - /opt/code/vsfm/bin/log
