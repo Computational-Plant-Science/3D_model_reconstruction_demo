@@ -1,4 +1,4 @@
-name: DIRT3D Reconstruction
+name: "DIRT3D: Reconstruction"
 author: Suxing Liu
 image: docker://computationalplantscience/3d-model-reconstruction
 public: True
@@ -20,8 +20,8 @@ output:
       - ply
 logo: media/Root3D.png
 gpu: True
-resources:
-  time: "24:00:00"
-  mem: "20GB"
+jobqueue:
+  walltime: "24:00:00"
+  memory: "20GB"
   processes: 1
   cores: 12
