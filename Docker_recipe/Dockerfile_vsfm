@@ -45,6 +45,7 @@ RUN pip3 install --upgrade pip && \
 
 ENV PATH=$PATH:/opt/code/vsfm/bin/
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/code/vsfm/bin/
+ENV QT_QPA_PLATFORM=minimal
 
 RUN mkdir -p /opt/code/vsfm/bin/log && \
     mkdir -p /opt/code/vsfm/bin/temp/log && \
