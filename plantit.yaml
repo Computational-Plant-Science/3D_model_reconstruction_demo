@@ -21,7 +21,7 @@ output:
       - nvm
       - ply
 logo: media/Root3D.png
-gpu: True
+gpu: False
 jobqueue:
   walltime: "24:00:00"
   memory: "20GB"

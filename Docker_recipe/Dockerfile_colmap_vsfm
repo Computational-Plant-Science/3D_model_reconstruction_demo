@@ -102,7 +102,7 @@ RUN cd /opt/code && \
 
 ENV PATH=$PATH:/opt/code/vsfm/bin/
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/code/vsfm/bin/
-ENV QT_QPA_PLATFORM=minimal
+ENV QT_QPA_PLATFORM=offscreen
 
 
 

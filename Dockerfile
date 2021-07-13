@@ -158,3 +158,4 @@ RUN pip3 install --upgrade pip && \
 # Set environment variables
 ENV PATH=$PATH:/opt/code/vsfm/bin/
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/code/vsfm/bin/
+
