@@ -24,6 +24,6 @@ logo: media/Root3D.png
 gpu: False
 jobqueue:
   walltime: "24:00:00"
-  memory: "20GB"
+  memory: "50GB"
   processes: 1
   cores: 12

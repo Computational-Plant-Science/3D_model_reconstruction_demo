@@ -25,11 +25,11 @@ def reconstruct(source, output_directory, gpu):
 
     # feature extraction
     # last two options prevent memory overconsumption in CPU mode https://colmap.github.io/faq.html#available-functionality-without-gpu-cuda
-    subprocess.run("colmap feature_extractor --image_path " +  source + " --database_path " + database + " --SiftExtraction.use_gpu=" + gpu + " --SiftExtraction.num_threads=2 --SiftExtraction.first_octave 0", shell=True)
+    subprocess.run("colmap feature_extractor --image_path " +  source + " --database_path " + database + " --SiftExtraction.use_gpu=" + str(gpu) + " --SiftExtraction.num_threads=2 --SiftExtraction.first_octave 0", shell=True)
 
     # feature matching
     # might need to use --SiftMatching.max_num_matches as per https://colmap.github.io/faq.html#feature-matching-fails-due-to-illegal-memory-access
-    subprocess.run("colmap exhaustive_matcher --database_path " + database + " --SiftMatching.use_gpu=" + gpu, shell=True)
+    subprocess.run("colmap exhaustive_matcher --database_path " + database + " --SiftMatching.use_gpu=" + str(gpu), shell=True)
 
     # build sparse model
     sparse = join(output_directory, 'sparse')
@@ -37,7 +37,7 @@ def reconstruct(source, output_directory, gpu):
     subprocess.run("colmap mapper --database_path " + database + " --image_path " + source + " --output_path " + sparse, shell=True)
 
     # convert models
-    # subprocess.run(f"colmap model_converter --input_path {join(sparse, '0')} --output_path {join(output_directory, 'model.nvm')} --output_type NVM", shell=True)
+    subprocess.run("colmap model_converter --input_path " + join(sparse, '0') + " --output_path " + join(output_directory, 'model.nvm') + " --output_type NVM", shell=True)
     subprocess.run("colmap model_converter --input_path " + join(sparse, '0') + " --output_path " + join(output_directory, 'model.ply') + " --output_type PLY", shell=True)
 
     # dense model
