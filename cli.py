@@ -1,15 +1,38 @@
+import multiprocessing
 import os
 import subprocess
 import time
 from datetime import timedelta
-from os.path import join
+from os import listdir
+from os.path import join, isfile
 
 import click
+
+from model_preprocess.bbox_seg import foreground_substractor
+from model_preprocess.blur_detector_image import detect_blur
 
 
 @click.group()
 def cli():
     pass
+
+
+@cli.command()
+@click.argument('source')
+@click.option('-o', '--output_directory', required=True, type=str, default='')
+@click.option('--patterns', '-p', multiple=True, type=str)
+def preprocess(source, output_directory, patterns):
+    # list all files in source dir
+    paths = [join(source, file) for file in listdir(source) if isfile(join(source, file))]
+
+    # filter the ones matching given patterns
+    paths = [p for p in paths if any(pattern.lower() in p.lower() for pattern in patterns)] if (patterns is not None and len(patterns) > 0) else paths
+
+    cores = multiprocessing.cpu_count()
+    args = [(path, output_directory) for i, path in enumerate(paths)]
+    with multiprocessing.Pool(processes=cores) as pool:
+        pool.imap(foreground_substractor, args)
+        pool.imap(detect_blur, args)
 
 
 @cli.command()
@@ -22,6 +45,9 @@ def reconstruct(source, output_directory, gpu):
 
     start = time.time()
     database = join(output_directory, 'database.db')
+
+    # pre-processing (bounding box segmentation and blur correction)
+    subprocess.run(f"python3 /opt/code/model_preprocess/bbox_seg.py -p /home/suxingliu/frame-interpolation/test-image/ -ft jpg ")
 
     # feature extraction
     # last two options prevent memory overconsumption in CPU mode https://colmap.github.io/faq.html#available-functionality-without-gpu-cuda
