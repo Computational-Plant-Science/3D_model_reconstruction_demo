@@ -79,7 +79,7 @@ def foreground_substractor(image_path, output_path):
     # construct the result file path
     #result_img_path = save_path + str(filename[0:-4]) + '_seg.png'
     
-    print("Extracting foreground for image : {0} \n".format(str(filename)))
+    print(f"Finding bounding box for {str(filename)} \n")
     
     # Load the image
     image = cv2.imread(image_path)
@@ -184,7 +184,7 @@ def foreground_substractor(image_path, output_path):
     #print img_width , img_height 
     
     # construct the result file path
-    result_img_path = join(output_path, str(filename[0:-4]) + '_seg.' + ext)
+    result_img_path = join(output_path, str(filename[0:-4]) + '_seg.png')
     
     crop_img = image[start_y:crop_height, start_x:crop_width]
     

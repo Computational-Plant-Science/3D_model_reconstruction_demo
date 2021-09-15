@@ -5,6 +5,7 @@ import time
 from datetime import timedelta
 from os import listdir
 from os.path import join, isfile
+import pprint
 
 import click
 
@@ -27,12 +28,14 @@ def preprocess(source, output_directory, patterns):
 
     # filter the ones matching given patterns
     paths = [p for p in paths if any(pattern.lower() in p.lower() for pattern in patterns)] if (patterns is not None and len(patterns) > 0) else paths
+    print(f"Matched files:")
+    pprint.pprint(paths)
 
     cores = multiprocessing.cpu_count()
     args = [(path, output_directory) for i, path in enumerate(paths)]
     with multiprocessing.Pool(processes=cores) as pool:
-        pool.imap(foreground_substractor, args)
-        pool.imap(detect_blur, args)
+        pool.starmap(foreground_substractor, args)
+        pool.starmap(detect_blur, args)
 
 
 @cli.command()

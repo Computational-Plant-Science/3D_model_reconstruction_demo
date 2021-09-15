@@ -35,7 +35,7 @@ from contextlib import closing
 
 import resource
 
-from blur_detector import detect_blur_fft
+from model_preprocess.blur_detector import detect_blur_fft
 import numpy as np
 import argparse
 import imutils
@@ -72,7 +72,7 @@ def detect_blur(image_path, output_path):
     # parse the file name
     path, filename = os.path.split(image_path)
 
-    print("Extracting foreground for image : {0} \n".format(str(filename)))
+    print(f"Running blur detection for {str(filename)}")
 
     # Load the image
     image = cv2.imread(image_path)

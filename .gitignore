@@ -17,3 +17,5 @@ data*
 data_big
 output
 *.log
+images
+*/__pycache__
