@@ -74,11 +74,12 @@ def detect_blur(image_path, output_path):
 
     print(f"Running blur detection for {str(filename)}")
 
-    # Load the image
-    image = cv2.imread(image_path)
-
     # load the input image from disk, resize it, and convert it to grayscale
     orig = cv2.imread(image_path)
+    if orig is None:
+        print(f"Could not read image {image_path}, skipping")
+        return
+
     orig = imutils.resize(orig, width=500)
     gray = cv2.cvtColor(orig, cv2.COLOR_BGR2GRAY)
 
@@ -87,7 +88,8 @@ def detect_blur(image_path, output_path):
 
     if blurry:
         print("Blurry")
-        shutil.move(image_path, join(output_path, str(filename[0:-4]) + '.' + ext))
+        os.remove(join(output_path, filename))  # remove the blurry image from the output directory
+        # shutil.move(image_path, join(output_path, str(filename[0:-4]) + '.' + ext))
     else:
         print("Clear")
 

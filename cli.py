@@ -49,9 +49,6 @@ def reconstruct(source, output_directory, gpu):
     start = time.time()
     database = join(output_directory, 'database.db')
 
-    # pre-processing (bounding box segmentation and blur correction)
-    subprocess.run(f"python3 /opt/code/model_preprocess/bbox_seg.py -p /home/suxingliu/frame-interpolation/test-image/ -ft jpg ")
-
     # feature extraction
     # last two options prevent memory overconsumption in CPU mode https://colmap.github.io/faq.html#available-functionality-without-gpu-cuda
     subprocess.run("colmap feature_extractor --image_path " +  source + " --database_path " + database + " --SiftExtraction.use_gpu=" + str(gpu) + " --SiftExtraction.num_threads=2 --SiftExtraction.first_octave 0", shell=True)

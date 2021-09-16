@@ -83,6 +83,9 @@ def foreground_substractor(image_path, output_path):
     
     # Load the image
     image = cv2.imread(image_path)
+    if image is None:
+        print(f"Could not load image {image_path}, skipping")
+        return
     
     #get size of image
     img_height, img_width = image.shape[:2]
