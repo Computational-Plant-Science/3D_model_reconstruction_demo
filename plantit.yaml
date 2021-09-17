@@ -2,7 +2,7 @@ name: "DIRT3D: Reconstruction"
 author: Suxing Liu
 image: docker://computationalplantscience/3d-model-reconstruction
 public: True
-commands: python3 /opt/code/cli.py reconstruct "$INPUT" -o $(dirname $INPUT) --gpu $GPU_MODE
+commands: python3 /opt/code/cli.py reconstruct "$INPUT" -o $(dirname $INPUT) -p $PREPROCESS -g $GPU_MODE
 env:
 - QT_QPA_PLATFORM=minimal
 mount:
@@ -10,7 +10,8 @@ mount:
 - /opt/code/vsfm/bin/log
 params:
   - name: preprocess
-  - type: boolean
+    type: boolean
+    default: True
 input:
   path:
   kind: directory

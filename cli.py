@@ -28,7 +28,7 @@ def preprocess(source, output_directory, patterns):
 
     # filter the ones matching given patterns
     paths = [p for p in paths if any(pattern.lower() in p.lower() for pattern in patterns)] if (patterns is not None and len(patterns) > 0) else paths
-    print(f"Matched files:")
+    print(f"Preprocessing {len(paths)} files:")
     pprint.pprint(paths)
 
     cores = multiprocessing.cpu_count()
@@ -41,10 +41,22 @@ def preprocess(source, output_directory, patterns):
 @cli.command()
 @click.argument('source')
 @click.option('-o', '--output_directory', required=True, type=str, default='')
-@click.option('--gpu', required=False, type=bool, default=False)
-def reconstruct(source, output_directory, gpu):
+@click.option('--preprocess', '-p', required=False, type=bool, default=False)
+@click.option('--gpu', '-g', required=False, type=bool, default=False)
+def reconstruct(source, output_directory, preprocess, gpu):
     if not os.path.exists(source):
         raise ValueError("Path does not exist!")
+
+    if preprocess:
+        paths = [join(source, file) for file in listdir(source) if isfile(join(source, file))]
+        print(f"Preprocessing {len(paths)} files:")
+        pprint.pprint(paths)
+
+        cores = multiprocessing.cpu_count()
+        args = [(path, output_directory) for i, path in enumerate(paths)]
+        with multiprocessing.Pool(processes=cores) as pool:
+            pool.starmap(foreground_substractor, args)
+            pool.starmap(detect_blur, args)
 
     start = time.time()
     database = join(output_directory, 'database.db')
