@@ -8,6 +8,10 @@ env:
 mount:
 - /opt/code/vsfm/bin/temp
 - /opt/code/vsfm/bin/log
+params:
+  - name: preprocess
+    type: boolean
+    default: True
 input:
   path:
   kind: directory
