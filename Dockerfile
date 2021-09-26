@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM nvidia/cuda:11.4.2-base-ubuntu20.04
 
 LABEL maintainer="Suxing Liu, Wes Bonelli"
 
@@ -14,6 +14,7 @@ RUN apt-get -ym update && \
     cmake \
     tzdata \
     build-essential \
+    mlocate \
     python3-pip \
     python3 \
     python3-setuptools \
@@ -28,7 +29,12 @@ RUN apt-get -ym update && \
     libfreeimage-dev \
     libgoogle-glog-dev \
     libgflags-dev \
+    libglfw3-dev \
+    libgl1-mesa-dev \
+    libglu1-mesa-dev \
+    freeglut3-dev \
     libglew-dev \
+    libdevil-dev \
     qtbase5-dev \
     libqt5opengl5-dev \
     libcgal-dev
@@ -60,7 +66,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 RUN apt-get -ym install libatlas-base-dev libsuitesparse-dev
 
 RUN git clone https://ceres-solver.googlesource.com/ceres-solver && \
-    git clone https://github.com/colmap/colmap.git
+    git clone https://github.com/colmap/colmap.git && \
+    git clone https://github.com/pitzer/SiftGPU.git
 
 # Install ceres-solver
 RUN cd ceres-solver && \
@@ -89,11 +96,8 @@ RUN wget http://ccwu.me/vsfm/download/VisualSFM_linux_64bit.zip && \
 	make
 
 # Install SiftGPU
-RUN wget https://github.com/pitzer/SiftGPU/archive/master.zip && \
-	unzip master.zip && \
-	rm  master.zip && \
-	mv SiftGPU-master SiftGPU && \
-	cd /opt/code/SiftGPU && \
+RUN cd SiftGPU && \
+    git checkout master && \
 	make && \
 	cp /opt/code/SiftGPU/bin/libsiftgpu.so /opt/code/vsfm/bin
 
