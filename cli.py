@@ -63,7 +63,7 @@ def reconstruct(source, output_directory, preprocess, gpu):
 
     # feature extraction
     # last two options prevent memory overconsumption in CPU mode https://colmap.github.io/faq.html#available-functionality-without-gpu-cuda
-    subprocess.run("colmap feature_extractor --image_path " + (output_directory if preprocess else source) + " --database_path " + database + " --SiftExtraction.use_gpu=" + str(gpu) + " --SiftExtraction.num_threads=2 --SiftExtraction.first_octave 0", shell=True)
+    subprocess.run("colmap feature_extractor --image_path " +  source + " --database_path " + database + (" --SiftExtraction.use_gpu=0 --SiftExtraction.num_threads=2 --SiftExtraction.first_octave 0" if not gpu else ''), shell=True)
 
     # feature matching
     # might need to use --SiftMatching.max_num_matches as per https://colmap.github.io/faq.html#feature-matching-fails-due-to-illegal-memory-access

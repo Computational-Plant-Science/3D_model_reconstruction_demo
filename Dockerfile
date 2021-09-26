@@ -10,6 +10,7 @@ RUN apt-get -ym update && \
     cmake \
     tzdata \
     build-essential \
+    mlocate \
     python3-pip \
     python3 \
     python3-setuptools \
@@ -24,7 +25,12 @@ RUN apt-get -ym update && \
     libfreeimage-dev \
     libgoogle-glog-dev \
     libgflags-dev \
+    libglfw3-dev \
+    libgl1-mesa-dev \
+    libglu1-mesa-dev \
+    freeglut3-dev \
     libglew-dev \
+    libdevil-dev \
     qtbase5-dev \
     libqt5opengl5-dev \
     libcgal-dev
