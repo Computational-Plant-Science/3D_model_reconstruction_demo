@@ -6,6 +6,7 @@ from datetime import timedelta
 from os import listdir
 from os.path import join, isfile
 import pprint
+from pathlib import Path
 
 import click
 
@@ -20,27 +21,7 @@ def cli():
 
 @cli.command()
 @click.argument('source')
-@click.option('-o', '--output_directory', required=True, type=str, default='')
-@click.option('--patterns', '-p', multiple=True, type=str)
-def preprocess(source, output_directory, patterns):
-    # list all files in source dir
-    paths = [join(source, file) for file in listdir(source) if isfile(join(source, file))]
-
-    # filter the ones matching given patterns
-    paths = [p for p in paths if any(pattern.lower() in p.lower() for pattern in patterns)] if (patterns is not None and len(patterns) > 0) else paths
-    print(f"Preprocessing {len(paths)} files:")
-    pprint.pprint(paths)
-
-    cores = multiprocessing.cpu_count()
-    args = [(path, output_directory) for i, path in enumerate(paths)]
-    with multiprocessing.Pool(processes=cores) as pool:
-        pool.starmap(foreground_substractor, args)
-        pool.starmap(detect_blur, args)
-
-
-@cli.command()
-@click.argument('source')
-@click.option('-o', '--output_directory', required=True, type=str, default='')
+@click.option('--output_directory', '-o', required=True, type=str, default='')
 @click.option('--preprocess', '-p', required=False, type=bool, default=False)
 @click.option('--gpu', '-g', required=False, type=bool, default=False)
 def reconstruct(source, output_directory, preprocess, gpu):
@@ -51,19 +32,22 @@ def reconstruct(source, output_directory, preprocess, gpu):
         paths = [join(source, file) for file in listdir(source) if isfile(join(source, file))]
         print(f"Preprocessing {len(paths)} files:")
         pprint.pprint(paths)
+        preprocessed_directory = Path('preprocessed')
+        preprocessed_directory.mkdir(exist_ok=True)
 
         cores = multiprocessing.cpu_count()
-        args = [(path, output_directory) for i, path in enumerate(paths)]
+        args = [(path, preprocessed_directory.absolute()) for i, path in enumerate(paths)]
         with multiprocessing.Pool(processes=cores) as pool:
             pool.starmap(foreground_substractor, args)
             pool.starmap(detect_blur, args)
+    else: preprocessed_directory = None
 
     start = time.time()
     database = join(output_directory, 'database.db')
 
     # feature extraction
     # last two options prevent memory overconsumption in CPU mode https://colmap.github.io/faq.html#available-functionality-without-gpu-cuda
-    subprocess.run("colmap feature_extractor --image_path " +  source + " --database_path " + database + (" --SiftExtraction.use_gpu=0 --SiftExtraction.num_threads=2 --SiftExtraction.first_octave 0" if not gpu else ''), shell=True)
+    subprocess.run("colmap feature_extractor --image_path " + (source if preprocessed_directory is None else preprocessed_directory.name) + " --database_path " + database + (" --SiftExtraction.use_gpu=0 --SiftExtraction.num_threads=2 --SiftExtraction.first_octave 0" if not gpu else ''), shell=True)
 
     # feature matching
     # might need to use --SiftMatching.max_num_matches as per https://colmap.github.io/faq.html#feature-matching-fails-due-to-illegal-memory-access
@@ -72,14 +56,11 @@ def reconstruct(source, output_directory, preprocess, gpu):
     # build sparse model
     sparse = join(output_directory, 'sparse')
     subprocess.run("mkdir " + sparse, shell=True)
-    subprocess.run("colmap mapper --database_path " + database + " --image_path " + source + " --output_path " + sparse, shell=True)
+    subprocess.run("colmap mapper --database_path " + database + " --image_path " + (source if preprocessed_directory is None else preprocessed_directory.name) + " --output_path " + sparse, shell=True)
 
     # convert models
     subprocess.run("colmap model_converter --input_path " + join(sparse, '0') + " --output_path " + join(output_directory, 'model.nvm') + " --output_type NVM", shell=True)
     subprocess.run("colmap model_converter --input_path " + join(sparse, '0') + " --output_path " + join(output_directory, 'model.ply') + " --output_type PLY", shell=True)
-
-    # dense model
-    subprocess.run("/opt/code/vsfm/bin/VisualSFM sfm+loadnvm+pmvs " + join(output_directory, 'model.nvm') + " " + join(output_directory, 'dense.nvm'), shell=True)
 
     end = time.time()
     print("Finished in " + str(timedelta(seconds=(end - start))))

@@ -79,7 +79,7 @@ def foreground_substractor(image_path, output_path):
     # construct the result file path
     #result_img_path = save_path + str(filename[0:-4]) + '_seg.png'
     
-    print(f"Finding bounding box for {str(filename)} \n")
+    print(f"Finding bounding box for {str(filename)}")
     
     # Load the image
     image = cv2.imread(image_path)
