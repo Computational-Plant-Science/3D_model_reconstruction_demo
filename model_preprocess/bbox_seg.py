@@ -24,6 +24,8 @@ argument:
 import os,fnmatch
 import argparse
 import shutil
+from os.path import join
+
 import cv2
 
 import numpy as np
@@ -68,19 +70,22 @@ def mkdir(path):
         return False
 
 
-def foreground_substractor(image_file):
+def foreground_substractor(image_path, output_path):
     
   
     #parse the file name 
-    path, filename = os.path.split(image_file)
+    path, filename = os.path.split(image_path)
     
     # construct the result file path
     #result_img_path = save_path + str(filename[0:-4]) + '_seg.png'
     
-    print("Extracting foreground for image : {0} \n".format(str(filename)))
+    print(f"Finding bounding box for {str(filename)}")
     
     # Load the image
-    image = cv2.imread(image_file)
+    image = cv2.imread(image_path)
+    if image is None:
+        print(f"Could not load image {image_path}, skipping")
+        return
     
     #get size of image
     img_height, img_width = image.shape[:2]
@@ -182,7 +187,7 @@ def foreground_substractor(image_file):
     #print img_width , img_height 
     
     # construct the result file path
-    result_img_path = save_path + str(filename[0:-4]) + '_seg.' + ext
+    result_img_path = join(output_path, str(filename[0:-4]) + '_seg.png')
     
     crop_img = image[start_y:crop_height, start_x:crop_width]
     
@@ -292,7 +297,8 @@ if __name__ == '__main__':
     # extract the bouding box for each image in file list
     with closing(Pool(processes = agents)) as pool:
         #result = pool.map(foreground_substractor, imgList)
-        pool.map(foreground_substractor, imgList)
+        args=[(img, save_path) for img in imgList]
+        pool.imap(foreground_substractor, args)
         pool.terminate()
     
     

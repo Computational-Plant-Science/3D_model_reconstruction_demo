@@ -2,9 +2,9 @@ name: "DIRT3D: Reconstruction"
 author: Suxing Liu
 image: docker://computationalplantscience/3d-model-reconstruction
 public: True
-commands: python3 /opt/code/cli.py reconstruct "$INPUT" -o $(dirname $INPUT) -p $PREPROCESS -g $GPU_MODE
+commands: /opt/code/plantit_pipeline.sh
 env:
-- QT_QPA_PLATFORM=minimal
+- QT_QPA_PLATFORM=offscreen
 mount:
 - /opt/code/vsfm/bin/temp
 - /opt/code/vsfm/bin/log
@@ -25,9 +25,9 @@ output:
       - nvm
       - ply
 logo: media/Root3D.png
-gpu: False
+gpu: True
 jobqueue:
   walltime: "24:00:00"
-  memory: "50GB"
+  memory: "40GB"
   processes: 1
-  cores: 12
+  cores: 1

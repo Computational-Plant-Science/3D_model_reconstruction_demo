@@ -1,3 +1,6 @@
 data*
-output*
 *.log
+images
+output*
+*.sif
+*.gif

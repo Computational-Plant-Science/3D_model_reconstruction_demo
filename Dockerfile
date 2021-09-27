@@ -1,14 +1,10 @@
-FROM nvidia/cuda:11.4.2-base-ubuntu20.04
-
+FROM geki/colmap
 LABEL maintainer="Suxing Liu, Wes Bonelli"
-
-#setup working directory
 COPY . /opt/code
-
 WORKDIR /opt/code
 
 RUN apt-get -ym update && \
-	DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
     git \
     wget \
     cmake \
@@ -65,28 +61,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 
 RUN apt-get -ym install libatlas-base-dev libsuitesparse-dev
 
-RUN git clone https://ceres-solver.googlesource.com/ceres-solver && \
-    git clone https://github.com/colmap/colmap.git && \
-    git clone https://github.com/pitzer/SiftGPU.git
-
-# Install ceres-solver
-RUN cd ceres-solver && \
-	git checkout $(git describe --tags) && \
-	mkdir build && \
-	cd build && \
-	cmake .. -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF && \
-	make && \
-	make install
-
-# Install colmap
-RUN cd colmap && \
-	git checkout master && \
-	mkdir build && \
-	cd build && \
-	cmake ../ && \
-	make && \
-	make install
-
 # Install VisualSFM
 RUN wget http://ccwu.me/vsfm/download/VisualSFM_linux_64bit.zip && \
 	unzip VisualSFM_linux_64bit.zip && \
@@ -94,12 +68,6 @@ RUN wget http://ccwu.me/vsfm/download/VisualSFM_linux_64bit.zip && \
 	cd vsfm && \
 	sed -i 's/LIB_LIST +=/LIB_LIST += -no-pie /' /opt/code/vsfm/makefile && \
 	make
-
-# Install SiftGPU
-RUN cd SiftGPU && \
-    git checkout master && \
-	make && \
-	cp /opt/code/SiftGPU/bin/libsiftgpu.so /opt/code/vsfm/bin
 
 # Install PBA
 RUN wget http://grail.cs.washington.edu/projects/mcba/pba_v1.0.5.zip && \
@@ -162,4 +130,5 @@ RUN pip3 install --upgrade pip && \
 # Set environment variables
 ENV PATH=$PATH:/opt/code/vsfm/bin/
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/code/vsfm/bin/
+ENV QT_QPA_PLATFORM=offscreen
 
