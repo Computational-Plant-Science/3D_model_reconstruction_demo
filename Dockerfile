@@ -131,4 +131,5 @@ RUN pip3 install --upgrade pip && \
 ENV PATH=$PATH:/opt/code/vsfm/bin/
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/code/vsfm/bin/
 ENV QT_QPA_PLATFORM=offscreen
-
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
