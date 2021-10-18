@@ -18,3 +18,4 @@ data_big
 output
 *.log
 *__pycache__*
+images
