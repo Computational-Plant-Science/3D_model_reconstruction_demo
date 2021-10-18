@@ -41,25 +41,22 @@ def reconstruct(source, output_directory, gpu):
     subprocess.run("colmap model_converter --input_path " + join(sparse, '0') + " --output_path " + join(output_directory, 'model.ply') + " --output_type PLY", shell=True)
 
     # dense model
-    subprocess.run("/opt/code/vsfm/bin/VisualSFM sfm+loadnvm+pmvs " + join(output_directory, 'model.nvm') + " " + join(output_directory, 'dense.nvm'), shell=True)
+    # subprocess.run("/opt/code/vsfm/bin/VisualSFM sfm+loadnvm+pmvs " + join(output_directory, 'model.nvm') + " " + join(output_directory, 'dense.nvm'), shell=True)
+
+    subprocess.run(f"mkdir {join(output_directory, 'dense')}", shell=True)
+    subprocess.run(f"colmap image_undistorter --image_path {source} --input_path {join(output_directory, 'sparse', '0')} --output_path {join(output_directory, 'dense')} --output_type COLMAP --max_image_size 2000", shell=True)
+
+    # patch match stereo
+    subprocess.run(f"colmap patch_match_stereo --workspace_path {join(output_directory, 'dense')}" + " --workspace_format COLMAP --PatchMatchStereo.geom_consistency true", shell=True)
+
+    # stereo fusion
+    subprocess.run(f"colmap stereo_fusion --workspace_path {join(output_directory, 'dense')} --workspace_format COLMAP --input_type geometric --output_path {join(output_directory, 'dense', 'fused.ply')}", shell=True)
+
+    # poisson mesher (only required for mesh, not point cloud)
+    # subprocess.run(f"colmap poisson_mesher --input_path {path}/dense/fused.ply --output_path {path}/dense/meshed-poisson.ply", shell=True)
 
     end = time.time()
     print("Finished in " + str(timedelta(seconds=(end - start))))
-
-    # TODO GPU version
-    '''
-    subprocess.run(f"mkdir {path}/dense", shell=True)
-    subprocess.run(f"colmap image_undistorter --image_path {path} --input_path {path}/sparse/0 --output_path {path}/dense --output_type COLMAP --max_image_size 2000", shell=True)
-
-    # patch match stereo
-    subprocess.run(f"colmap patch_match_stereo --workspace_path {path}/dense" + " --workspace_format COLMAP --PatchMatchStereo.geom_consistency true", shell=True)
-
-    # stereo fusion
-    subprocess.run(f"colmap stereo_fusion --workspace_path {path}/dense --workspace_format COLMAP --input_type geometric --output_path {path}/dense/fused.ply", shell=True)
-
-    # poisson mesher
-    subprocess.run(f"colmap poisson_mesher --input_path {path}/dense/fused.ply --output_path {path}/dense/meshed-poisson.ply", shell=True)
-    '''
 
 
 if __name__ == '__main__':
