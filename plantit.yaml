@@ -1,8 +1,8 @@
-name: "DIRT3D: Reconstruction"
+name: "DIRT3D: Reconstruction (GPU)"
 author: Suxing Liu
 image: docker://computationalplantscience/dirt3d-reconstruction-gpu
 public: True
-commands: python3 /opt/code/cli.py reconstruct $INPUT -o OUTPUT -g True -p $PREPROCESS
+commands: python3 /opt/code/pipeline.py reconstruct $INPUT -o OUTPUT -g True -p $PREPROCESS
 env:
 - QT_QPA_PLATFORM=offscreen
 params:
