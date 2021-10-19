@@ -1,8 +1,8 @@
 name: "DIRT3D: Reconstruction"
 author: Suxing Liu
-image: docker://computationalplantscience/3d-model-reconstruction
+image: docker://computationalplantscience/dirt3d-reconstruction-cpu
 public: True
-commands: /opt/code/plantit_pipeline.sh
+commands: python3 /opt/code/cli.py reconstruct $INPUT -o OUTPUT -g False -p $PREPROCESS
 env:
 - QT_QPA_PLATFORM=offscreen
 mount:
