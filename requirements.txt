@@ -4,5 +4,4 @@ matplotlib
 psutil
 scikit-image
 opencv-contrib-python
-click
 imutils

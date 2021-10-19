@@ -1,19 +1,18 @@
 """
 Version: 1.0
 
-Summary: pipeline of colmap and visualSFM for 3D model reconstruction from images
+Summary: 3D reconstruction pipeline (colmap+VSFM for CPU, colmap-only for GPU)
 
-Author: suxing liu
+Author: Suxing Liu
 
 Author-email: suxingliu@gmail.com
 
-USAGE:
+Usage: python3 pipeline.py <input directory> -o <output directory> -p <True or False> -g <True or False>
 
-python3 pipeline.py 
-
-
-argument:
-("-p", "--path", required = True,    help = "path to image file")
+Arguments:
+("-p", "--preprocess", required = False, help = "whether to preprocess images, defaults to False")
+("-o", "--output_directory", required = True, help = "where to write output files")
+("-p", "--preprocess", required = False, help = "whether to preprocess images, defaults to False")
 
 
 Note:
@@ -22,91 +21,82 @@ GPU related parameters
 --SiftMatching.use_gpu
 
 """
-
-import subprocess, os
-import sys
+import multiprocessing
+import subprocess
 
 import argparse
-import glob
-import fnmatch
-import os, os.path
+import os
+import os.path
+import time
+from datetime import timedelta
+from os import listdir
+from os.path import join, isfile
+
+import pprint
+from pathlib import Path
+
+from model_preprocess.bbox_seg import foreground_substractor
 
 
-def execute_script(command):
-    
-    try:
-        print(command)
-        print()
-        subprocess.run(command, shell = True)
-        
-    except OSError:
-        
-        print("Failed ...!\n")
+def reconstruct(source: str, output_directory: str, preprocess: bool, gpu: bool):
+    if not os.path.exists(source):
+        raise ValueError("Path does not exist!")
 
-    
+    if preprocess:
+        paths = [join(source, file) for file in listdir(source) if isfile(join(source, file))]
+        print("Preprocessing " + str(len(paths)) + " files:")
+        pprint.pprint(paths)
+        preprocessed_directory = Path('preprocessed')
+        preprocessed_directory.mkdir(exist_ok=True)
+        path_args = [(path, preprocessed_directory.absolute()) for path in paths]
+        with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+            pool.starmap(foreground_substractor, path_args)
 
-def colmap_vsfm_pipeline(file_path):
-    
-    currentDirectory = os.getcwd()
-    print(currentDirectory)
-    
-    if os.path.exists(file_path):
-        print("Image files path exist...\n")
+    start = time.time()
+    database = join(output_directory, 'database.db')
+
+    # feature extraction
+    # last two options prevent memory overconsumption in CPU mode https://colmap.github.io/faq.html#available-functionality-without-gpu-cuda
+    subprocess.run("colmap feature_extractor --image_path " + source + " --database_path " + database + ('' if gpu else ' --SiftExtraction.use_gpu=0 --SiftExtraction.num_threads=2 --SiftExtraction.first_octave 0'), shell=True)
+
+    # feature matching
+    # might need to use --SiftMatching.max_num_matches as per https://colmap.github.io/faq.html#feature-matching-fails-due-to-illegal-memory-access
+    subprocess.run("colmap exhaustive_matcher --database_path " + database + " --SiftMatching.use_gpu=" + str(gpu), shell=True)
+
+    # build sparse model
+    sparse = join(output_directory, 'sparse')
+    subprocess.run("mkdir " + sparse, shell=True)
+    subprocess.run("colmap mapper --database_path " + database + " --image_path " + source + " --output_path " + sparse, shell=True)
+
+    # convert models
+    subprocess.run("colmap model_converter --input_path " + join(sparse, '0') + " --output_path " + join(output_directory, 'sparse.nvm') + " --output_type NVM", shell=True)
+    subprocess.run("colmap model_converter --input_path " + join(sparse, '0') + " --output_path " + join(output_directory, 'sparse.ply') + " --output_type PLY", shell=True)
+
+    # dense model reconstruction (colmap on GPU, VSFM on CPU)
+    if gpu:
+        subprocess.run("mkdir " + join(output_directory, 'dense'), shell=True)
+        subprocess.run("colmap image_undistorter --image_path " + source + " --input_path " + join(output_directory, 'sparse', '0') + " --output_path " + join(output_directory, 'dense') + " --output_type COLMAP --max_image_size 2000", shell=True)
+        subprocess.run("colmap patch_match_stereo --workspace_path " + join(output_directory,'dense') + " --workspace_format COLMAP --PatchMatchStereo.geom_consistency true", shell=True)
+        subprocess.run("colmap stereo_fusion --workspace_path " + join(output_directory, 'dense') + " --workspace_format COLMAP --input_type geometric --output_path " + join(output_directory, 'dense.ply'), shell=True)
+        subprocess.run("colmap poisson_mesher --input_path " + join(output_directory, 'dense.ply') + " --output_path " + join(output_directory, 'mesh.ply'), shell=True)
     else:
-        print("Image files path was not valid!\n")
+        subprocess.run("/opt/code/vsfm/bin/VisualSFM sfm+loadnvm+pmvs " + join(output_directory, 'model.nvm') + " " + join(output_directory, 'dense.nvm'), shell=True)
 
-    feature_extract = "colmap feature_extractor --image_path " + file_path + " --database_path " + file_path + "/database.db " + "--SiftExtraction.use_gpu=false"
-    execute_script(feature_extract)
-    
-    feature_matching = "colmap exhaustive_matcher --database_path " + file_path + "/database.db" + " --SiftMatching.use_gpu=false"
-    execute_script(feature_matching)
-    
-    create_folder_sparse = "mkdir " + file_path + "/sparse" 
-    execute_script(create_folder_sparse)
-    
-    sparse_model = "colmap mapper --database_path " + file_path + "/database.db " + "--image_path " + file_path + " --output_path " + file_path + "/sparse" 
-    execute_script(sparse_model)
-    
-    nvm_model = "colmap model_converter --input_path " + file_path + "/sparse/0 " + " --output_path " + file_path + "/model.nvm " + " --output_type NVM"
-    execute_script(nvm_model)
-    
-    dense_model = "/opt/code/vsfm/bin/VisualSFM sfm+loadnvm+pmvs " + file_path + "/model.nvm " + file_path + "/dense.nvm "
-    execute_script(dense_model)
-    
-    
-    '''
-    #reserved for future GPU version
-    create_folder_dense = "mkdir " + file_path + "/dense" 
-    execute_script(create_folder_dense)
-    
-    #GPU required
-    dense_model = "colmap image_undistorter --image_path "+ file_path + " --input_path " + file_path + "/sparse/0 --output_path " + file_path + "/dense --output_type COLMAP --max_image_size 2000"
-    execute_script(dense_model)
-    
-    
-    patch_match_stereo = "colmap patch_match_stereo --workspace_path " + file_path + "/dense" + " --workspace_format COLMAP --PatchMatchStereo.geom_consistency true"
-    execute_script(patch_match_stereo)
-    
-    stereo_fusion = "colmap stereo_fusion --workspace_path " + file_path + "/dense" + " --workspace_format COLMAP --input_type geometric --output_path " + file_path + "/dense/fused.ply"
-    execute_script(stereo_fusion)
-    
-    poisson_mesher = " colmap poisson_mesher --input_path " + file_path + "/dense/fused.ply" + " --output_path " + file_path +"/dense/meshed-poisson.ply"
-    execute_script(poisson_mesher)
-    '''
-    
-    
+    end = time.time()
+    print("Finished in " + str(timedelta(seconds=(end - start))))
+
 
 if __name__ == '__main__':
-
-    # construct the argument and parse the arguments
     ap = argparse.ArgumentParser()
-    ap.add_argument("-p", "--path", required = False, default = '/srv/images', help = "path to image file")
+    ap.add_argument("-i", "--input_directory", required=True, help="where to find input images")
+    ap.add_argument("-o", "--output_directory", required=False, default=".", help="where to write results")
+    ap.add_argument("-p", "--preprocess", required=False, default=False, help="whether to preprocess images")
+    ap.add_argument("-g", "--gpu", required=False, default=False, help="whether to use GPUs")
     args = vars(ap.parse_args())
 
-   
-    # setting path to cross section image files
-    file_path = args["path"]
-    
-   
-    colmap_vsfm_pipeline(file_path)
-    
+    source = args["input_directory"]
+    target = args["output_directory"]
+    preprocess = args["preprocess"]
+    gpu = args["gpu"]
+
+    reconstruct(source, target, preprocess, gpu)
