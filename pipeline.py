@@ -10,16 +10,10 @@ Author-email: suxingliu@gmail.com
 Usage: python3 pipeline.py <input directory> -o <output directory> -p <True or False> -g <True or False>
 
 Arguments:
-("-p", "--preprocess", required = False, help = "whether to preprocess images, defaults to False")
+("-i", "--input_diirectory", required = True, help = "where to find input image files")
 ("-o", "--output_directory", required = True, help = "where to write output files")
 ("-p", "--preprocess", required = False, help = "whether to preprocess images, defaults to False")
-
-
-Note:
-GPU related parameters
---SiftExtraction.use_gpu 
---SiftMatching.use_gpu
-
+("-g", "--gpu", required = False, default = False, help = "whether to use GPUs")
 """
 import multiprocessing
 import subprocess
