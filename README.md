@@ -41,8 +41,6 @@ Open a shell in your current working directory:
 singularity shell --nv docker://computationalplantscience/dirt3d-reconstruction-gpu
 ```
 
-Add the `--nv` flag to use GPUs.
-
 Then use the same command to reconstruct a model from a directory of images (see above).
 
 ## Visualizing a 3D point cloud
