@@ -8,40 +8,37 @@ For example, a real root and a reconstruction, side by side:
     
 # Usage
 
-The easiest way to use this software is with Docker or Singularity.
+The easiest way to use this software is with Docker or Singularity. There are two versions of the image definition, one for CPUs and one for GPUs. **Note that reconstruction will fail if the GPU image is used on a host without GPU hardware.**
 
-## Reconstructing a 3D point cloud from an image set
+- `computationalplantscience/dirt3d-reconstruction-cpu`: uses colamp for sparse model reconstruction, then VSFM for dense
+- `computationalplantscience/dirt3d-reconstruction-gpu`: uses colamp for both sparse and dense models
+
+## Reconstructing a 3D point cloud from an image set on a machine with GPUs
 
 ### Docker
-
-Pull the recipe with: `docker pull computationalplantscience/dirt3d-reconstruction`
 
 Mount the current working directory and open an interactive shell:
 
 ```shell
-docker run -it -v $(pwd):/opt/dev -w /opt/dev computationalplantscience/dirt3d-reconstruction bash
+docker run -it --gpus all -v $(pwd):/opt/dev -w /opt/dev computationalplantscience/dirt3d-reconstruction-gpu bash
 ```
-
-(To allow the software to take advantage of GPUs on your machine, use `--gpus all`.)
 
 Then reconstruct a model from a directory of images:
 
 ```shell
-python3 /opt/code/cli/py reconstruct <input directory> -o <output directory>
+python3 /opt/code/pipeline.py -i <input directory> -o <output directory> -g True
 ```
-
-This will produce a `model.ply` file in the output directory.
 
 To enable initial pre-processing (crops to the largest feature and throws out blurry images), use the `-p True` flag.
 
-### Singularity
+This will produce `sparse.ply`, `dense.ply`, and `mesh.ply` files in the output directory.
 
-Pull the recipe with `singularity pull docker://computationalplantscience/dirt3d-reconstruction`
+### Singularity
 
 Open a shell in your current working directory:
 
 ```shell
-singularity shell docker://computationalplantscience/dirt3d-reconstruction
+singularity shell --nv docker://computationalplantscience/dirt3d-reconstruction-gpu
 ```
 
 Add the `--nv` flag to use GPUs.
