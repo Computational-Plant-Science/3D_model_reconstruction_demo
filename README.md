@@ -10,8 +10,8 @@ For example, a real root and a reconstruction, side by side:
 
 The easiest way to use this software is with Docker or Singularity. There are two versions of the image definition, one for CPUs and one for GPUs. **Note that reconstruction will fail if the GPU image is used on a host without GPU hardware.**
 
-- `computationalplantscience/dirt3d-reconstruction-cpu`: uses colamp for sparse model reconstruction, then VSFM for dense
-- `computationalplantscience/dirt3d-reconstruction-gpu`: uses colamp for both sparse and dense models
+- `computationalplantscience/dirt3d-reconstruction-cpu`: uses colmap for sparse model reconstruction, then VSFM for dense
+- `computationalplantscience/dirt3d-reconstruction-gpu`: uses colmap for both sparse and dense models
 
 ## Reconstructing a 3D point cloud from an image set on a machine with GPUs
 
