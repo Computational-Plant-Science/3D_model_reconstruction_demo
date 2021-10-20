@@ -1,6 +1,6 @@
 # DIRT3D Reconstruction
 
-Reconstruct a 3D point cloud root model from a set of images.
+Reconstruct a 3D point cloud root model from images.
  
 For example, a real root and a reconstruction, side by side:
 
@@ -13,7 +13,7 @@ The easiest way to use this software is with Docker or Singularity. There are tw
 - `computationalplantscience/dirt3d-reconstruction-cpu`: uses colmap for sparse model reconstruction, then VSFM for dense
 - `computationalplantscience/dirt3d-reconstruction-gpu`: uses colmap for both sparse and dense models
 
-## Reconstructing a 3D point cloud from an image set on a machine with GPUs
+## Reconstructing a 3D point cloud with GPUs
 
 ### Docker
 
