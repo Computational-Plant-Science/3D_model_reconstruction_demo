@@ -1,13 +1,10 @@
 name: "DIRT3D: Reconstruction (CPU)"
 author: Suxing Liu
-image: docker://computationalplantscience/dirt3d-reconstruction-cpu
+image: docker://computationalplantscience/dirt3d-reconstruction
 public: True
-commands: python3 /opt/code/pipeline.py -i $INPUT -o OUTPUT -g False -p $PREPROCESS
+commands: python3 /opt/code/pipeline.py -i $INPUT -o OUTPUT -g $GPU -p $PREPROCESS
 env:
 - QT_QPA_PLATFORM=offscreen
-mount:
-- /opt/code/vsfm/bin/temp
-- /opt/code/vsfm/bin/log
 params:
   - name: preprocess
     type: boolean
@@ -27,7 +24,7 @@ output:
 logo: media/Root3D.png
 gpu: True
 jobqueue:
-  walltime: "24:00:00"
+  walltime: "12:00:00"
   memory: "20GB"
   processes: 1
   cores: 1
