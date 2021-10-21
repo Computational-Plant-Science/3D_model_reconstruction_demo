@@ -15,7 +15,7 @@ pmvs-2/program/main/pmvs2
 *.img
 data*
 data_big
-output
+output*
 *.log
 *__pycache__*
 images
