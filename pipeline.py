@@ -77,13 +77,18 @@ def reconstruct(
     subprocess.run("colmap model_converter --input_path " + join(sparse, '0') + " --output_path " + join(output_directory, 'sparse.nvm') + " --output_type NVM", shell=True)
     subprocess.run("colmap model_converter --input_path " + join(sparse, '0') + " --output_path " + join(output_directory, 'sparse.ply') + " --output_type PLY", shell=True)
 
+    # dense model reconstruction
+    subprocess.run("mkdir " + join(output_directory, 'dense'), shell=True)
     if gpu:
-        # dense model reconstruction
-        subprocess.run("mkdir " + join(output_directory, 'dense'), shell=True)
         subprocess.run("colmap image_undistorter --image_path " + input_directory + " --input_path " + join(output_directory, 'sparse', '0') + " --output_path " + join(output_directory, 'dense') + " --output_type COLMAP --max_image_size 2000", shell=True)
         subprocess.run("colmap patch_match_stereo --workspace_path " + join(output_directory,'dense') + " --workspace_format COLMAP --PatchMatchStereo.geom_consistency true", shell=True)
         subprocess.run("colmap stereo_fusion --workspace_path " + join(output_directory, 'dense') + " --workspace_format COLMAP --input_type geometric --output_path " + join(output_directory, 'dense.ply'), shell=True)
         subprocess.run("colmap poisson_mesher --input_path " + join(output_directory, 'dense.ply') + " --output_path " + join(output_directory, 'mesh.ply'), shell=True)
+    else:
+        subprocess.run("colmap image_undistorter --image_path " + input_directory + " --input_path " + join(output_directory, 'sparse', '0') + " --output_path " + join(output_directory, 'dense') + " --output_type PMVS --max_image_size 2000", shell=True)
+        subprocess.run("pmvs2 " + join(output_directory, 'dense', 'pmvs') + "/ option-all", shell=True)
+        subprocess.run("mv " + join(output_directory, 'dense', 'pmvs', 'models', 'option-all.ply') + " " + join(output_directory, 'dense.ply'), shell=True)
+
 
     end = time.time()
     print("Finished in " + str(timedelta(seconds=(end - start))))

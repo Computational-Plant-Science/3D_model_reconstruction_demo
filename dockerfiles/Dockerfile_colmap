@@ -33,7 +33,8 @@ RUN apt-get -ym update && \
     libdevil-dev \
     qtbase5-dev \
     libqt5opengl5-dev \
-    libcgal-dev
+    libcgal-dev \
+    unzip
 #
 # RUN apt-get -ym update && \
 #     DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -70,17 +71,14 @@ RUN apt-get -ym update && \
 # 	cp -v /opt/code/pba/bin/libpba_no_gpu.so /opt/code/vsfm/bin/libpba.so
 
 # Install CMVS-PMVS
-# RUN wget https://github.com/pmoulon/CMVS-PMVS/archive/master.zip && \
-# 	unzip master.zip && \
-# 	rm master.zip && \
-# 	mv CMVS-PMVS-master CMVS-PMVS && \
-# 	mkdir -p /opt/code/CMVS-PMVS/program/build && \
-# 	cd /opt/code/CMVS-PMVS/program/build && \
-# 	cmake .. && \
-# 	make install && \
-# 	cp /opt/code/CMVS-PMVS/program/build/main/cmvs /opt/code/vsfm/bin/ && \
-# 	cp /opt/code/CMVS-PMVS/program/build/main/pmvs2 /opt/code/vsfm/bin/ && \
-# 	cp /opt/code/CMVS-PMVS/program/build/main/genOption /opt/code/vsfm/bin/
+RUN wget https://github.com/pmoulon/CMVS-PMVS/archive/master.zip && \
+	unzip master.zip && \
+	rm master.zip && \
+	mv CMVS-PMVS-master CMVS-PMVS && \
+	mkdir -p /opt/code/CMVS-PMVS/program/build && \
+	cd /opt/code/CMVS-PMVS/program/build && \
+	cmake .. && \
+	make install
 
 # Install Graclus
 # RUN wget http://www.cs.utexas.edu/users/dml/Software/graclus1.2.tar.gz && \
