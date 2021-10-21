@@ -12,6 +12,10 @@ The easiest way to use this software is with Docker or Singularity. A public Doc
 
 ## Docker
 
+Pull an image or a repository from a registry
+```shell
+docker pull computationalplantscience/dirt3d-reconstruction
+```
 Mount the current working directory and open an interactive shell:
 
 ```shell
@@ -87,7 +91,7 @@ Author: Johannes L. Schoenberger (jsch-at-demuc-dot-de)
 }
 
 # Author
-Suxing Liu (suxingliu@gmail.com)
+Suxing Liu (suxingliu@gmail.com), Wesley Paul Bonelli(wbonelli@uga.edu)
 
 ## Other contributions
 
