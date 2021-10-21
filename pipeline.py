@@ -15,7 +15,7 @@ Arguments:
 ("-s", "--segmentation", required=False, default=False, help="whether to apply root segmentation to images")
 ("-bd", "--blur_detection", required=False, default=False, help="whether to apply blur detection and omit blurry images")
 ("-gc", "--gamma_correction", required=False, default=False, help="whether to apply gamma correction to images"
-("-g", "--gpu", required=False, default=False, help="whether to use GPUs")
+("-g", "--gpu", required=True, default=False, help="whether to use GPUs")
 """
 import distutils
 import multiprocessing
