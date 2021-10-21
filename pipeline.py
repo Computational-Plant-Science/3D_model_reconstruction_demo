@@ -7,7 +7,7 @@ Author: Suxing Liu, Wesley Paul Bonelli
 
 Author-email: suxingliu@gmail.com, wbonelli@uga.edu
 
-Usage: python3 pipeline.py <input directory> -o <output directory> -p <True or False> -g <True or False>
+Usage: python3 pipeline.py -i <input directory> -o <output directory> -g <True or False>
 
 Arguments:
 ("-i", "--input_directory", required=True, help="where to find input image files")
