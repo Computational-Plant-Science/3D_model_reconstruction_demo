@@ -69,12 +69,7 @@ def mkdir(path):
 
 
 def detect_blur(image_path, output_path):
-    # parse the file name
     path, filename = os.path.split(image_path)
-
-    print(f"Running blur detection for {str(filename)}")
-
-    # load the input image from disk, resize it, and convert it to grayscale
     orig = cv2.imread(image_path)
     if orig is None:
         print(f"Could not read image {image_path}, skipping")
@@ -82,18 +77,13 @@ def detect_blur(image_path, output_path):
 
     orig = imutils.resize(orig, width=500)
     gray = cv2.cvtColor(orig, cv2.COLOR_BGR2GRAY)
-
-    # apply our blur detector using the FFT
     (mean, blurry) = detect_blur_fft(gray, size=60, thresh=20, vis=(-1 > 0))
 
     if blurry:
-        print("Blurry")
-        os.remove(join(output_path, filename))  # remove the blurry image from the output directory
-        # shutil.move(image_path, join(output_path, str(filename[0:-4]) + '.' + ext))
+        print(filename + " is too blurry, omitting")
     else:
-        print("Clear")
-
-    # return blurry
+        print(filename + " is clear enough")
+        cv2.imwrite(join(output_path, filename), orig)
 
 
 if __name__ == '__main__':

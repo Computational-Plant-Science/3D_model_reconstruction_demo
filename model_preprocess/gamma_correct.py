@@ -9,7 +9,7 @@ Author-email: suxingliu@gmail.com
 
 USAGE:
 
-python3 gamma_correction.py -p /home/suxingliu/model-scan/test-image/ -ft jpg 
+python3 correct_gamma.py -p /home/suxingliu/model-scan/test-image/ -ft jpg
 
 
 argument:
@@ -24,6 +24,9 @@ argument:
 import os,fnmatch
 import argparse
 import shutil
+from os.path import join
+from pathlib import Path
+
 import cv2
 
 import numpy as np
@@ -75,6 +78,7 @@ def adjust_gamma(image, gamma):
     # apply gamma correction using the lookup table
     return cv2.LUT(image, table)
 
+
 #apply CLAHE (Contrast Limited Adaptive Histogram Equalization) to perfrom image enhancement
 def image_enhance(img):
 
@@ -99,41 +103,25 @@ def image_enhance(img):
     return img_enhance
 
 
-
-def gamma_correction(image_file):
-    
-  
-    #parse the file name 
+def correct_gamma(image_file, output_path):
+    # parse the file name
     path, filename = os.path.split(image_file)
-    
-    #filename, file_extension = os.path.splitext(image_file)
-    
-    # construct the result file path
-    result_img_path = save_path + str(filename[0:-4]) + '.' + ext
-    
-    print("Enhancing image : {0} \n".format(str(filename)))
-    
+    print(f"Enhancing image {str(filename)}")
+
     # Load the image
     image = cv2.imread(image_file)
     
     #get size of image
     img_height, img_width = image.shape[:2]
     
-    #image = cv2.resize(image, (0,0), fx = scale_factor, fy = scale_factor) 
-    
-    gamma = 1.5
-    
     # apply gamma correction and show the images
+    gamma = 1.5
     gamma = gamma if gamma > 0 else 0.1
-    
     adjusted = adjust_gamma(image, gamma=gamma)
-    
     enhanced_image = image_enhance(adjusted)
 
     # save result as images for reference
-    cv2.imwrite(result_img_path,enhanced_image)
-
-
+    cv2.imwrite(join(output_path, Path(image_file).stem + "_gc" + Path(image_file).suffix), enhanced_image)
 
 
 if __name__ == '__main__':
@@ -160,8 +148,8 @@ if __name__ == '__main__':
 
     # make the folder to store the results
     parent_path = os.path.abspath(os.path.join(file_path, os.pardir))
-    #mkpath = parent_path + '/' + str('gamma_correction')
-    mkpath = file_path + '/' + str('gamma_correction')
+    #mkpath = parent_path + '/' + str('correct_gamma')
+    mkpath = file_path + '/' + str('correct_gamma')
     mkdir(mkpath)
     save_path = mkpath + '/'
 
@@ -177,12 +165,12 @@ if __name__ == '__main__':
     
     # Create a pool of processes. By default, one is created for each CPU in the machine.
     # extract the bouding box for each image in file list
-    with closing(Pool(processes = agents)) as pool:
-        result = pool.map(gamma_correction, imgList)
+    with closing(Pool(processes=agents)) as pool:
+        args = [(img, save_path) for img in imgList]
+        result = pool.imap(correct_gamma, imgList)
         pool.terminate()
     
-      
-    # monitor memory usage 
+    # monitor memory usage
     rusage_denom = 1024.0
     
     print("Memory usage: {0} MB\n".format(int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / rusage_denom)))

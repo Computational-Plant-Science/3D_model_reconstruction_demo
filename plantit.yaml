@@ -25,7 +25,6 @@ output:
   path:
   include:
     patterns:
-      - nvm
       - ply
 logo: media/Root3D.png
 gpu: True
