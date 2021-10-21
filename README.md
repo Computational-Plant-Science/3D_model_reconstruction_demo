@@ -87,7 +87,7 @@ Author: Johannes L. Schoenberger (jsch-at-demuc-dot-de)
 }
 
 # Author
-Suxing Liu (suxingliu@gmail.com)
+Suxing Liu (suxingliu@gmail.com), Wesley Paul Bonelli(wbonelli@uga.edu)
 
 ## Other contributions
 
