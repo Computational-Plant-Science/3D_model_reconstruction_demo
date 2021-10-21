@@ -12,6 +12,10 @@ The easiest way to use this software is with Docker or Singularity. A public Doc
 
 ## Docker
 
+Pull an image or a repository from a registry
+```shell
+docker pull computationalplantscience/dirt3d-reconstruction
+```
 Mount the current working directory and open an interactive shell:
 
 ```shell
