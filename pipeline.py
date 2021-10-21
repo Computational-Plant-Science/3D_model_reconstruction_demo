@@ -3,9 +3,9 @@ Version: 1.0
 
 Summary: 3D reconstruction pipeline
 
-Author: Suxing Liu
+Author: Suxing Liu, Wesley Paul Bonelli
 
-Author-email: suxingliu@gmail.com
+Author-email: suxingliu@gmail.com, wbonelli@uga.edu
 
 Usage: python3 pipeline.py <input directory> -o <output directory> -p <True or False> -g <True or False>
 
