@@ -3,7 +3,7 @@ Version: 1.0
 
 Summary: 3D reconstruction pipeline
 
-Author: Suxing Liu, Wesley Paul Bonelli
+Author: Suxing Liu, Wesley Bonelli
 
 Author-email: suxingliu@gmail.com, wbonelli@uga.edu
 
@@ -122,7 +122,7 @@ def reconstruct(
     # feature matching
     # TODO might need --SiftMatching.max_num_matches as per https://colmap.github.io/faq.html#feature-matching-fails-due-to-illegal-memory-access
     subprocess.run("colmap exhaustive_matcher --database_path " + database_path + \
-                   ((' --SiftMatching.gpu_index=' + gpu_index) if gpus else ' --SiftExtraction.use_gpu=0'), shell=True)
+                   ((' --SiftMatching.gpu_index=' + gpu_index) if gpus else ' --SiftMatching.use_gpu=0'), shell=True)
 
     end = time.time()
     feature_matching_delta = timedelta(seconds=(end - start))
@@ -156,7 +156,7 @@ def reconstruct(
         # patch match
         # TODO make geom_consistency/filter optional, maybe other optimizations here https://colmap.github.io/faq.html#speedup-dense-reconstruction
         subprocess.run("colmap patch_match_stereo --workspace_path " + dense_dir_path + \
-                       " --workspace_format COLMAP --PatchMatchStereo.geom_consistency false --PatchMatchStereo.filter true" + \
+                       " --workspace_format COLMAP --PatchMatchStereo.geom_consistency true" + \
                        ((' --PatchMatchStereo.gpu_index=' + gpu_index) if gpus else ''), shell=True)
 
         # stereo fusion
