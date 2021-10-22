@@ -15,7 +15,7 @@ Arguments:
 ("-s", "--segmentation", required=False, default=False, help="whether to apply root segmentation")
 ("-b", "--blur_detection", required=False, default=False, help="whether to omit blurry images")
 ("-c", "--correct_gamma", required=False, default=False, help="whether to apply gamma correction"
-("-g", "--gpu", required=False, default=False, help="whether to use GPUs")
+("-g", "--gpu", type=int, default=0, help="how many GPUs to use (set to 0 for CPUs-only)")
 """
 from distutils import util
 import multiprocessing
@@ -43,9 +43,15 @@ def reconstruct(
         segmentation,
         blur_detection,
         gamma_correction,
-        gpu):
-    if not os.path.exists(input_directory):
-        raise ValueError("Input directory does not exist!")
+        gpus):
+    if not os.path.exists(input_directory): raise ValueError("Input directory does not exist!")
+
+    # precompute GPU index
+    gpu_index = ','.join([str(i) for i in range(0, gpus)])
+    if gpus:
+        print("Using " + str(gpus) + " GPU" + ("s" if gpus > 1 else ""))
+    else:
+        print("Not using GPUs")
 
     # start timing
     start = time.time()
@@ -102,8 +108,11 @@ def reconstruct(
     # feature extraction
     database_path = join(output_directory, 'database.db')
     subprocess.run("colmap feature_extractor --image_path " + input_directory + " --database_path " + database_path + \
-                   # last 2 options prevent memory overconsumption with CPU https://colmap.github.io/faq.html#available-functionality-without-gpu-cuda
-                   ('' if gpu else ' --SiftExtraction.use_gpu=0 --SiftExtraction.num_threads=2 --SiftExtraction.first_octave 0'), shell=True)
+                   ((' --SiftExtraction.gpu_index=' + gpu_index) if gpus else ' --SiftExtraction.use_gpu=0 '
+                                                                                  # last 2 options prevent memory overconsumption with CPU
+                                                                                  # https://colmap.github.io/faq.html#available-functionality-without-gpu-cuda
+                                                                                  '--SiftExtraction.num_threads=2 '
+                                                                                  '--SiftExtraction.first_octave 0'), shell=True)
 
     end = time.time()
     feature_extraction_delta = timedelta(seconds=(end - start))
@@ -112,7 +121,8 @@ def reconstruct(
 
     # feature matching
     # TODO might need --SiftMatching.max_num_matches as per https://colmap.github.io/faq.html#feature-matching-fails-due-to-illegal-memory-access
-    subprocess.run("colmap exhaustive_matcher --database_path " + database_path + " --SiftMatching.use_gpu=" + str(gpu), shell=True)
+    subprocess.run("colmap exhaustive_matcher --database_path " + database_path + \
+                   ((' --SiftMatching.gpu_index=' + gpu_index) if gpus else ' --SiftExtraction.use_gpu=0'), shell=True)
 
     end = time.time()
     feature_matching_delta = timedelta(seconds=(end - start))
@@ -135,27 +145,37 @@ def reconstruct(
     start = time.time()
 
     # build dense model
-    # TODO maybe make colamp vs pmvs2 configurable?
     dense_dir = Path(join(output_directory, 'dense'))
     dense_dir.mkdir(exist_ok=True)
     dense_dir_path = str(dense_dir.absolute())
-    if gpu:
+    if gpus:
+        # image undistortion
         subprocess.run("colmap image_undistorter --image_path " + input_directory + " --input_path " + inner_sparse_dir_path + " --output_path " + \
                        dense_dir_path + " --output_type COLMAP --max_image_size 2000", shell=True)
-        subprocess.run("colmap patch_match_stereo --workspace_path " + dense_dir_path + \
-                       " --workspace_format COLMAP --PatchMatchStereo.geom_consistency true", shell=True)
 
+        # patch match
+        # TODO make geom_consistency/filter optional, maybe other optimizations here https://colmap.github.io/faq.html#speedup-dense-reconstruction
+        subprocess.run("colmap patch_match_stereo --workspace_path " + dense_dir_path + \
+                       " --workspace_format COLMAP --PatchMatchStereo.geom_consistency false --PatchMatchStereo.filter true" + \
+                       ((' --PatchMatchStereo.gpu_index=' + gpu_index) if gpus else ''), shell=True)
+
+        # stereo fusion
         dense_model_path = join(output_directory, 'dense.ply')
         subprocess.run("colmap stereo_fusion --workspace_path " + join(output_directory, 'dense') + \
                        " --workspace_format COLMAP --input_type geometric --output_path " + dense_model_path, shell=True)
 
+        # generate mesh
         mesh_model_path = join(output_directory, 'mesh.ply')
         subprocess.run("colmap poisson_mesher --input_path " + dense_model_path + " --output_path " + mesh_model_path, shell=True)
     else:
+        # image undistortion
         subprocess.run("colmap image_undistorter --image_path " + input_directory + " --input_path " + join(output_directory, 'sparse', '0') + \
                        " --output_path " + join(output_directory, 'dense') + " --output_type PMVS --max_image_size 2000", shell=True)
+
+        # PMVS2 for CPU dense reconstruction
         subprocess.run("pmvs2 " + join(output_directory, 'dense', 'pmvs') + "/ option-all", shell=True)
-        subprocess.run("mv " + join(output_directory, 'dense', 'pmvs', 'models', 'option-all.ply') + " " + join(output_directory, 'dense.ply'),
+        subprocess.run("mv " + join(output_directory, 'dense', 'pmvs', 'models', 'option-all.ply') + \
+                       " " + join(output_directory, 'dense.ply'),  # move the model to the output dir
                        shell=True)
 
     end = time.time()
@@ -189,7 +209,7 @@ if __name__ == '__main__':
     ap.add_argument("-s", "--segmentation", type=str2bool, nargs='?', const=True, default=False, help="whether to apply root segmentation")
     ap.add_argument("-b", "--blur_detection", type=str2bool, nargs='?', const=True, default=False, help="whether to omit blurry images")
     ap.add_argument("-c", "--gamma_correction", type=str2bool, nargs='?', const=True, default=False, help="whether to apply gamma correction")
-    ap.add_argument("-g", "--gpu", type=str2bool, nargs='?', const=True, default=False, help="whether to use GPUs")
+    ap.add_argument("-g", "--gpus", type=int, default=0, help="how many GPUs to use (set to 0 for CPUs-only)")
     args = vars(ap.parse_args())
 
     reconstruct(
@@ -198,4 +218,4 @@ if __name__ == '__main__':
         bool(args["segmentation"]),
         bool(args["blur_detection"]),
         bool(args["gamma_correction"]),
-        bool(args["gpu"]))
+        int(args["gpus"]))

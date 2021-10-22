@@ -41,10 +41,17 @@ To allow `colmap` to use CUDA-enabled GPUs, use the `--nv` flag.
 To reconstruct a point cloud from an image set, use `pipeline.py` as such:
 
 ```shell
-python3 /opt/code/pipeline.py -i <input directory> -o <output directory> -g <whether to use GPUs>
+python3 /opt/code/pipeline.py -i <input directory> -o <output directory> -g <how many GPUs to use>
 ```
 
-This will produce `sparse.ply` and `dense.ply` files in the output directory.
+Omit the `-g <# of GPUs>` argument or set it to 0 to perform the reconstruction with CPUs only.
+
+A successful reconstruction will produce several files in the output directory:
+
+- `sparse.ply`: sparse point cloud model
+- `dense.ply`: dense point cloud model
+- `mesh.ply`: dense mesh model
+- `times.csv`: time costs per step
 
 ### Preprocessing
 
