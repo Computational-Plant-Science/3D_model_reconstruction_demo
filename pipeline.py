@@ -46,6 +46,7 @@ def reconstruct(
 
     # start timing preprocessing
     start = time.time()
+    start_all = start
 
     # preprocessing steps
     if segmentation:
@@ -90,7 +91,8 @@ def reconstruct(
 
     recon_paths = [join(input_directory, file) for file in listdir(input_directory) if isfile(join(input_directory, file))]
     if len(recon_paths) < 2: raise ValueError("Not enough files for reconstruction (" + str(len(recon_paths)) + ")")
-    print("Starting reconstruction from " + str(len(recon_paths)) + " files")
+
+    print("Starting feature extraction from " + str(len(recon_paths)) + " files")
     start = time.time()
 
     # feature extraction
@@ -99,19 +101,32 @@ def reconstruct(
                    # last 2 options prevent memory overconsumption with CPU https://colmap.github.io/faq.html#available-functionality-without-gpu-cuda
                    ('' if gpu else ' --SiftExtraction.use_gpu=0 --SiftExtraction.num_threads=2 --SiftExtraction.first_octave 0'), shell=True)
 
+    end = time.time()
+    print("Feature extraction completed in " + str(timedelta(seconds=(end - start))) + ", starting feature matching")
+    start = time.time()
+
     # feature matching
     # TODO might need --SiftMatching.max_num_matches as per https://colmap.github.io/faq.html#feature-matching-fails-due-to-illegal-memory-access
     subprocess.run("colmap exhaustive_matcher --database_path " + database_path + " --SiftMatching.use_gpu=" + str(gpu), shell=True)
+
+    end = time.time()
+    print("Feature matching completed in " + str(timedelta(seconds=(end - start))) + ", building sparse model")
+    start = time.time()
 
     # build sparse model
     outer_sparse_dir = Path(join(output_directory, 'sparse'))
     outer_sparse_dir.mkdir(exist_ok=True)
     inner_sparse_dir_path = join(output_directory, 'sparse', '0')
     sparse_model_path = join(output_directory, 'sparse.ply')
-    subprocess.run("colmap mapper --database_path " + database_path + " --image_path " + input_directory + \
-                   " --output_path " + str(outer_sparse_dir.absolute()), shell=True)
+    cmd = "colmap mapper --database_path " + database_path + " --image_path " + input_directory + \
+          " --output_path " + join(outer_sparse_dir.parent.stem, outer_sparse_dir.stem)
+    subprocess.run(cmd, shell=True)
     subprocess.run("colmap model_converter --input_path " + inner_sparse_dir_path + \
                    " --output_path " + sparse_model_path + " --output_type PLY", shell=True)
+
+    end = time.time()
+    print("Sparse model completed in " + str(timedelta(seconds=(end - start))) + ", building dense model")
+    start = time.time()
 
     # build dense model
     dense_dir = Path(join(output_directory, 'dense'))
@@ -121,11 +136,11 @@ def reconstruct(
         subprocess.run("colmap image_undistorter --image_path " + input_directory + " --input_path " + inner_sparse_dir_path + " --output_path " + \
                        dense_dir_path + " --output_type COLMAP --max_image_size 2000", shell=True)
         subprocess.run("colmap patch_match_stereo --workspace_path " + dense_dir_path + \
-                       "--workspace_format COLMAP --PatchMatchStereo.geom_consistency true", shell=True)
+                       " --workspace_format COLMAP --PatchMatchStereo.geom_consistency true", shell=True)
 
         dense_model_path = join(output_directory, 'dense.ply')
         subprocess.run("colmap stereo_fusion --workspace_path " + join(output_directory, 'dense') + \
-                       "--workspace_format COLMAP --input_type geometric --output_path " + dense_model_path, shell=True)
+                       " --workspace_format COLMAP --input_type geometric --output_path " + dense_model_path, shell=True)
 
         mesh_model_path = join(output_directory, 'mesh.ply')
         subprocess.run("colmap poisson_mesher --input_path " + dense_model_path + " --output_path " + mesh_model_path, shell=True)
@@ -137,7 +152,8 @@ def reconstruct(
                        shell=True)
 
     end = time.time()
-    print("Reconstruction completed in " + str(timedelta(seconds=(end - start))))
+    print("Dense model completed in " + str(timedelta(seconds=(end - start))))
+    print("Reconstruction completed in " + str(timedelta(seconds=(end - start_all))))
 
 
 # adapted from https://stackoverflow.com/a/43357954/6514033

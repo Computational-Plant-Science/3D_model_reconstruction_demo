@@ -19,3 +19,5 @@ output*
 *.log
 *__pycache__*
 images
+blur_omitted
+segmented

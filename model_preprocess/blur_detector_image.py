@@ -75,8 +75,8 @@ def detect_blur(image_path, output_path):
         print(f"Could not read image {image_path}, skipping")
         return
 
-    orig = imutils.resize(orig, width=500)
-    gray = cv2.cvtColor(orig, cv2.COLOR_BGR2GRAY)
+    resized = imutils.resize(orig, width=500)
+    gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
     (mean, blurry) = detect_blur_fft(gray, size=60, thresh=20, vis=(-1 > 0))
 
     if blurry:

@@ -50,9 +50,9 @@ This will produce `sparse.ply` and `dense.ply` files in the output directory.
 
 There are several optional preprocessing steps, all of which accept values `True` or `False` (and default to `False`): 
 
-- `-s`/`--segmentation`: crops to the largest feature and throws out blurry images
-- `-bd`/`--blur_detection`: detects and omits blurry images
-- `-gc`/`--gamma_correction`: increases brightness of dark images
+- `-s`/`--segmentation`: crops to the largest feature
+- `-b`/`--blur_detection`: detects and omits blurry images
+- `-c`/`--gamma_correction`: increases brightness of dark images
 
 ## Visualizing a 3D point cloud
 
