@@ -49,7 +49,7 @@ def reconstruct(
 
     # start timing
     start = time.time()
-    start_all = start
+    start_all = time.time()
 
     # preprocessing steps
     if segmentation:
