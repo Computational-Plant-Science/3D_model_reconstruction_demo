@@ -24,10 +24,13 @@ import argparse
 import os
 import os.path
 import time
+import csv
 from datetime import timedelta
 from os import listdir
 from os.path import join, isfile
 from pathlib import Path
+
+import humanize
 
 from model_preprocess.bbox_seg import foreground_substractor
 from model_preprocess.blur_detector_image import detect_blur
@@ -44,7 +47,7 @@ def reconstruct(
     if not os.path.exists(input_directory):
         raise ValueError("Input directory does not exist!")
 
-    # start timing preprocessing
+    # start timing
     start = time.time()
     start_all = start
 
@@ -53,10 +56,10 @@ def reconstruct(
         seg_paths = [join(input_directory, file) for file in listdir(input_directory) if isfile(join(input_directory, file))]
         if len(seg_paths) < 2: raise ValueError("Not enough files (" + str(len(seg_paths)) + ")")
 
-        seg_dir = Path('segmented')
+        seg_dir = Path(join(output_directory, 'segmented'))
         seg_dir.mkdir(exist_ok=True)
         seg_args = [(path, seg_dir.absolute()) for path in seg_paths]
-        input_directory = str(seg_dir.absolute())  # update input dir
+        input_directory = str(seg_dir.absolute())
 
         print("Segmenting " + str(len(seg_paths)) + " file(s)")
         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
@@ -65,10 +68,10 @@ def reconstruct(
         bo_paths = [join(input_directory, file) for file in listdir(input_directory) if isfile(join(input_directory, file))]
         if len(bo_paths) < 2: raise ValueError("Not enough files (" + str(len(bo_paths)) + ")")
 
-        bo_dir = Path('blur_omitted')
+        bo_dir = Path(join(output_directory, 'blur_omitted'))
         bo_dir.mkdir(exist_ok=True)
         bo_args = [(path, bo_dir.absolute()) for path in bo_paths]
-        input_directory = str(bo_dir.absolute())  # update input dir
+        input_directory = str(bo_dir.absolute())
 
         print("Applying blur detection to " + str(len(bo_paths)) + " file(s)")
         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
@@ -77,23 +80,24 @@ def reconstruct(
         gc_paths = [join(input_directory, file) for file in listdir(input_directory) if isfile(join(input_directory, file))]
         if len(gc_paths) < 2: raise ValueError("Not enough files (" + str(len(gc_paths)) + ")")
 
-        gc_dir = Path('gamma_corrected')
+        gc_dir = Path(join(output_directory, 'gamma_corrected'))
         gc_dir.mkdir(exist_ok=True)
         gc_args = [(path, gc_dir.absolute()) for path in gc_paths]
-        input_directory = str(gc_dir.absolute())  # update input dir
+        input_directory = str(gc_dir.absolute())
 
         print("Applying gamma correction to " + str(len(gc_paths)) + " file(s)")
         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
             pool.starmap(correct_gamma, gc_args)
 
     end = time.time()
-    print("Preprocessing completed in " + str(timedelta(seconds=(end - start))))
-
-    recon_paths = [join(input_directory, file) for file in listdir(input_directory) if isfile(join(input_directory, file))]
-    if len(recon_paths) < 2: raise ValueError("Not enough files for reconstruction (" + str(len(recon_paths)) + ")")
-
-    print("Starting feature extraction from " + str(len(recon_paths)) + " files")
+    preprocessing_delta = timedelta(seconds=(end - start))
+    print("Preprocessing completed in " + humanize.naturaldelta(preprocessing_delta))
     start = time.time()
+
+    # make sure we have enough files to run the reconstruction (TODO: is 2 a reasonable minimum?)
+    image_paths = [join(input_directory, file) for file in listdir(input_directory) if isfile(join(input_directory, file))]
+    if len(image_paths) < 2: raise ValueError("Not enough images to begin reconstruction (" + str(len(image_paths)) + ")")
+    print("Starting feature extraction from " + str(len(image_paths)) + " images")
 
     # feature extraction
     database_path = join(output_directory, 'database.db')
@@ -102,7 +106,8 @@ def reconstruct(
                    ('' if gpu else ' --SiftExtraction.use_gpu=0 --SiftExtraction.num_threads=2 --SiftExtraction.first_octave 0'), shell=True)
 
     end = time.time()
-    print("Feature extraction completed in " + str(timedelta(seconds=(end - start))) + ", starting feature matching")
+    feature_extraction_delta = timedelta(seconds=(end - start))
+    print("Feature extraction completed in " + humanize.naturaldelta(feature_extraction_delta) + ", starting feature matching")
     start = time.time()
 
     # feature matching
@@ -110,7 +115,8 @@ def reconstruct(
     subprocess.run("colmap exhaustive_matcher --database_path " + database_path + " --SiftMatching.use_gpu=" + str(gpu), shell=True)
 
     end = time.time()
-    print("Feature matching completed in " + str(timedelta(seconds=(end - start))) + ", building sparse model")
+    feature_matching_delta = timedelta(seconds=(end - start))
+    print("Feature matching completed in " + humanize.naturaldelta(feature_matching_delta) + ", building sparse model")
     start = time.time()
 
     # build sparse model
@@ -118,17 +124,18 @@ def reconstruct(
     outer_sparse_dir.mkdir(exist_ok=True)
     inner_sparse_dir_path = join(output_directory, 'sparse', '0')
     sparse_model_path = join(output_directory, 'sparse.ply')
-    cmd = "colmap mapper --database_path " + database_path + " --image_path " + input_directory + \
-          " --output_path " + join(outer_sparse_dir.parent.stem, outer_sparse_dir.stem)
-    subprocess.run(cmd, shell=True)
+    subprocess.run("colmap mapper --database_path " + database_path + " --image_path " + input_directory + \
+                   " --output_path " + join(outer_sparse_dir.parent.stem, outer_sparse_dir.stem), shell=True)
     subprocess.run("colmap model_converter --input_path " + inner_sparse_dir_path + \
                    " --output_path " + sparse_model_path + " --output_type PLY", shell=True)
 
     end = time.time()
-    print("Sparse model completed in " + str(timedelta(seconds=(end - start))) + ", building dense model")
+    sparse_model_delta = timedelta(seconds=(end - start))
+    print("Sparse model completed in " + humanize.naturaldelta(sparse_model_delta) + ", building dense model")
     start = time.time()
 
     # build dense model
+    # TODO maybe make colamp vs pmvs2 configurable?
     dense_dir = Path(join(output_directory, 'dense'))
     dense_dir.mkdir(exist_ok=True)
     dense_dir_path = str(dense_dir.absolute())
@@ -152,8 +159,22 @@ def reconstruct(
                        shell=True)
 
     end = time.time()
-    print("Dense model completed in " + str(timedelta(seconds=(end - start))))
-    print("Reconstruction completed in " + str(timedelta(seconds=(end - start_all))))
+    dense_model_delta = timedelta(seconds=(end - start))
+    print("Dense model completed in " + humanize.naturaldelta(dense_model_delta))
+
+    total_delta = timedelta(seconds=(end - start_all))
+    print("Reconstruction completed in " + humanize.naturaldelta(total_delta))
+
+    # write time cost data to CSV
+    with open(join(output_directory, 'times.csv'), 'w') as file:
+        writer = csv.writer(file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        writer.writerow(['preprocessing', 'feature_extraction', 'feature_matching', 'sparse_model', 'dense_model'])
+        writer.writerow([
+            preprocessing_delta.total_seconds(),
+            feature_matching_delta.total_seconds(),
+            feature_matching_delta.total_seconds(),
+            sparse_model_delta.total_seconds(),
+            dense_model_delta.total_seconds()])
 
 
 # adapted from https://stackoverflow.com/a/43357954/6514033

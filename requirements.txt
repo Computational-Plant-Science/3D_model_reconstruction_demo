@@ -5,3 +5,4 @@ psutil
 scikit-image
 opencv-contrib-python
 imutils
+humanize
