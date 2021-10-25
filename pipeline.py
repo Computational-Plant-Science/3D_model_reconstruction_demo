@@ -43,7 +43,8 @@ def reconstruct(
         segmentation,
         blur_detection,
         gamma_correction,
-        gpus):
+        gpus,
+        dense_strategy):
     if not os.path.exists(input_directory): raise ValueError("Input directory does not exist!")
 
     # precompute GPU index
@@ -144,15 +145,16 @@ def reconstruct(
     print("Sparse model completed in " + humanize.naturaldelta(sparse_model_delta) + ", building dense model")
     start = time.time()
 
-    # build dense model
     dense_dir = Path(join(output_directory, 'dense'))
     dense_dir.mkdir(exist_ok=True)
     dense_dir_path = str(dense_dir.absolute())
-    if gpus:
-        # image undistortion
-        subprocess.run("colmap image_undistorter --image_path " + input_directory + " --input_path " + inner_sparse_dir_path + " --output_path " + \
-                       dense_dir_path + " --output_type COLMAP --max_image_size 2000", shell=True)
 
+    # image undistortion
+    subprocess.run("colmap image_undistorter --image_path " + input_directory + " --input_path " + inner_sparse_dir_path + " --output_path " + \
+                   dense_dir_path + " --output_type " + dense_strategy + " --max_image_size 2000", shell=True)
+
+    # build dense model
+    if gpus and dense_strategy == 'COLMAP':
         # patch match
         # TODO make geom_consistency/filter optional, maybe other optimizations here https://colmap.github.io/faq.html#speedup-dense-reconstruction
         subprocess.run("colmap patch_match_stereo --workspace_path " + dense_dir_path + \
@@ -168,9 +170,8 @@ def reconstruct(
         mesh_model_path = join(output_directory, 'mesh.ply')
         subprocess.run("colmap poisson_mesher --input_path " + dense_model_path + " --output_path " + mesh_model_path, shell=True)
     else:
-        # image undistortion
-        subprocess.run("colmap image_undistorter --image_path " + input_directory + " --input_path " + join(output_directory, 'sparse', '0') + \
-                       " --output_path " + join(output_directory, 'dense') + " --output_type PMVS --max_image_size 2000", shell=True)
+        if dense_strategy == 'COLMAP':
+            print("COLMAP dense reconstruction only supported on GPU hardware")
 
         # PMVS2 for CPU dense reconstruction
         subprocess.run("pmvs2 " + join(output_directory, 'dense', 'pmvs') + "/ option-all", shell=True)
@@ -210,7 +211,12 @@ if __name__ == '__main__':
     ap.add_argument("-b", "--blur_detection", type=str2bool, nargs='?', const=True, default=False, help="whether to omit blurry images")
     ap.add_argument("-c", "--gamma_correction", type=str2bool, nargs='?', const=True, default=False, help="whether to apply gamma correction")
     ap.add_argument("-g", "--gpus", type=int, default=0, help="how many GPUs to use (set to 0 for CPUs-only)")
+    ap.add_argument("-d", "--dense_strategy", required=False, type=str, default='PMVS', help="whether to use PMVS or COLMAP for dense reconstruction")
     args = vars(ap.parse_args())
+
+    dense_strategy = args["dense_strategy"]
+    if dense_strategy != 'PMVS' and dense_strategy != 'COLMAP':
+        raise ValueError("Dense reconstruction strategy must be either PMVS or COLMAP")
 
     reconstruct(
         args["input_directory"],
@@ -218,4 +224,5 @@ if __name__ == '__main__':
         bool(args["segmentation"]),
         bool(args["blur_detection"]),
         bool(args["gamma_correction"]),
-        int(args["gpus"]))
+        int(args["gpus"]),
+        dense_strategy)
