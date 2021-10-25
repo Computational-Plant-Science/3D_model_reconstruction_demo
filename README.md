@@ -61,6 +61,10 @@ There are several optional preprocessing steps, all of which accept values `True
 - `-b`/`--blur_detection`: detects and omits blurry images
 - `-c`/`--gamma_correction`: increases brightness of dark images
 
+### PMVS2 vs. Colmap for dense reconstruction
+
+By default, PMVS2 is used for dense reconstruction on both CPU and GPU. Colmap can optionally be used with GPUs. It tends to produce significantly denser models but may run up to an order of magnitude more slowly. To enable dense reconstruction with Colmap, use `-d COLMAP`.
+
 ## Visualizing a 3D point cloud
 
 Currently this software does not support model visualization. PLY files can be visualized with e.g. [Meshlab](https://www.meshlab.net/) or [cloudcompare](https://www.danielgm.net/cc/).
