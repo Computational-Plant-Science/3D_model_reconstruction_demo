@@ -44,7 +44,13 @@ def reconstruct(
         blur_detection,
         gamma_correction,
         gpus,
-        dense_strategy):
+        dense_strategy,
+        cache_size,
+        window_step,
+        window_radius,
+        num_iterations,
+        num_samples,
+        geom_consistency):
     if not os.path.exists(input_directory): raise ValueError("Input directory does not exist!")
 
     # precompute GPU index
@@ -108,12 +114,14 @@ def reconstruct(
 
     # feature extraction
     database_path = join(output_directory, 'database.db')
-    subprocess.run("colmap feature_extractor --image_path " + input_directory + " --database_path " + database_path + \
-                   ((' --SiftExtraction.gpu_index=' + gpu_index) if gpus else ' --SiftExtraction.use_gpu=0 '
+    subprocess.run("colmap feature_extractor" + \
+                   " --image_path " + input_directory + \
+                   " --database_path " + database_path + \
+                   ((' --SiftExtraction.gpu_index=' + gpu_index) if gpus else ' --SiftExtraction.use_gpu=0'
                                                                                   # last 2 options prevent memory overconsumption with CPU
                                                                                   # https://colmap.github.io/faq.html#available-functionality-without-gpu-cuda
-                                                                                  '--SiftExtraction.num_threads=2 '
-                                                                                  '--SiftExtraction.first_octave 0'), shell=True)
+                                                                                  ' --SiftExtraction.num_threads=2'
+                                                                                  ' --SiftExtraction.first_octave 0'), shell=True)
 
     end = time.time()
     feature_extraction_delta = timedelta(seconds=(end - start))
@@ -122,7 +130,8 @@ def reconstruct(
 
     # feature matching
     # TODO might need --SiftMatching.max_num_matches as per https://colmap.github.io/faq.html#feature-matching-fails-due-to-illegal-memory-access
-    subprocess.run("colmap exhaustive_matcher --database_path " + database_path + \
+    subprocess.run("colmap exhaustive_matcher" + \
+                   " --database_path " + database_path + \
                    ((' --SiftMatching.gpu_index=' + gpu_index) if gpus else ' --SiftMatching.use_gpu=0'), shell=True)
 
     end = time.time()
@@ -135,10 +144,14 @@ def reconstruct(
     outer_sparse_dir.mkdir(exist_ok=True)
     inner_sparse_dir_path = join(output_directory, 'sparse', '0')
     sparse_model_path = join(output_directory, 'sparse.ply')
-    subprocess.run("colmap mapper --database_path " + database_path + " --image_path " + input_directory + \
+    subprocess.run("colmap mapper" + \
+                   " --database_path " + database_path + \
+                   " --image_path " + input_directory + \
                    " --output_path " + join(outer_sparse_dir.parent.stem, outer_sparse_dir.stem), shell=True)
-    subprocess.run("colmap model_converter --input_path " + inner_sparse_dir_path + \
-                   " --output_path " + sparse_model_path + " --output_type PLY", shell=True)
+    subprocess.run("colmap model_converter" + \
+                   " --input_path " + inner_sparse_dir_path + \
+                   " --output_path " + sparse_model_path + \
+                   " --output_type PLY", shell=True)
 
     end = time.time()
     sparse_model_delta = timedelta(seconds=(end - start))
@@ -150,25 +163,41 @@ def reconstruct(
     dense_dir_path = str(dense_dir.absolute())
 
     # image undistortion
-    subprocess.run("colmap image_undistorter --image_path " + input_directory + " --input_path " + inner_sparse_dir_path + " --output_path " + \
-                   dense_dir_path + " --output_type " + dense_strategy + " --max_image_size 2000", shell=True)
+    subprocess.run("colmap image_undistorter" + \
+                   " --image_path " + input_directory + \
+                   " --input_path " + inner_sparse_dir_path + \
+                   " --output_path " + dense_dir_path + \
+                   " --output_type " + dense_strategy + \
+                   " --max_image_size 2000", shell=True)
 
     # build dense model
     if gpus and dense_strategy == 'COLMAP':
         # patch match
-        # TODO make geom_consistency/filter optional, maybe other optimizations here https://colmap.github.io/faq.html#speedup-dense-reconstruction
-        subprocess.run("colmap patch_match_stereo --workspace_path " + dense_dir_path + \
-                       " --workspace_format COLMAP --PatchMatchStereo.geom_consistency true" + \
+        subprocess.run("colmap patch_match_stereo" + \
+                       " --workspace_path " + dense_dir_path + \
+                       " --workspace_format COLMAP" + \
+                       " --PatchMatchStereo.cache_size=" + cache_size + \
+                       " --PatchMatchStereo.window_step=" + window_step + \
+                       " --PatchMatchStereo.window_radius=" + window_radius + \
+                       " --PatchMatchStereo.num_iterations=" + num_iterations + \
+                       " --PatchMatchStereo.num_samples=" + num_samples + \
+                       " --PatchMatchStereo.geom_consistency " + ('true' if geom_consistency else 'false') + \
+                       " --PatchMatchStereo.filter " + ('false' if geom_consistency else 'true') + \
                        ((' --PatchMatchStereo.gpu_index=' + gpu_index) if gpus else ''), shell=True)
 
         # stereo fusion
         dense_model_path = join(output_directory, 'dense.ply')
-        subprocess.run("colmap stereo_fusion --workspace_path " + join(output_directory, 'dense') + \
-                       " --workspace_format COLMAP --input_type geometric --output_path " + dense_model_path, shell=True)
+        subprocess.run("colmap stereo_fusion" + \
+                       " --workspace_path " + join(output_directory, 'dense') + \
+                       " --workspace_format COLMAP" + \
+                       " --input_type geometric" + \
+                       " --output_path " + dense_model_path, shell=True)
 
         # generate mesh
         mesh_model_path = join(output_directory, 'mesh.ply')
-        subprocess.run("colmap poisson_mesher --input_path " + dense_model_path + " --output_path " + mesh_model_path, shell=True)
+        subprocess.run("colmap poisson_mesher" + \
+                       " --input_path " + dense_model_path + \
+                       " --output_path " + mesh_model_path, shell=True)
     else:
         if dense_strategy == 'COLMAP':
             print("COLMAP dense reconstruction only supported on GPU hardware")
@@ -207,11 +236,17 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--input_directory", required=True, help="folder to find input images in")
     ap.add_argument("-o", "--output_directory", required=False, default=".", help="folder to write results to")
-    ap.add_argument("-s", "--segmentation", type=str2bool, nargs='?', const=True, default=False, help="whether to apply root segmentation")
-    ap.add_argument("-b", "--blur_detection", type=str2bool, nargs='?', const=True, default=False, help="whether to omit blurry images")
-    ap.add_argument("-c", "--gamma_correction", type=str2bool, nargs='?', const=True, default=False, help="whether to apply gamma correction")
+    ap.add_argument("--segmentation", type=str2bool, nargs='?', const=True, default=False, help="whether to apply root segmentation")
+    ap.add_argument("--blur_detection", type=str2bool, nargs='?', const=True, default=False, help="whether to omit blurry images")
+    ap.add_argument("--gamma_correction", type=str2bool, nargs='?', const=True, default=False, help="whether to apply gamma correction")
     ap.add_argument("-g", "--gpus", type=int, default=0, help="how many GPUs to use (set to 0 for CPUs-only)")
     ap.add_argument("-d", "--dense_strategy", required=False, type=str, default='PMVS', help="whether to use PMVS or COLMAP for dense reconstruction")
+    ap.add_argument("--cache_size", required=False, type=int, default=32, help="Colmap patch matching cache size")
+    ap.add_argument("--window_step", required=False, type=int, default=1, help="Colmap patch window step size")
+    ap.add_argument("--window_radius", required=False, type=int, default=5, help="Colmap patch window radius")
+    ap.add_argument("--num_iterations", required=False, type=int, default=5, help="Colmap patch match iterations")
+    ap.add_argument("--num_samples", required=False, type=int, default=15, help="Colmap patch match sampled views")
+    ap.add_argument("--geom_consistency", required=False, type=str2bool, nargs='?', const=True, help="Colmap patch match geometric reconstruction")
     args = vars(ap.parse_args())
 
     dense_strategy = args["dense_strategy"]
@@ -225,4 +260,10 @@ if __name__ == '__main__':
         bool(args["blur_detection"]),
         bool(args["gamma_correction"]),
         int(args["gpus"]),
-        dense_strategy)
+        dense_strategy,
+        int(args["cache_size"]),
+        int(args["window_step"]),
+        int(args["window_radius"]),
+        int(args["num_iterations"]),
+        int(args["num_samples"]),
+        bool(args["geom_consistency"]))

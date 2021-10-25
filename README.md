@@ -44,7 +44,7 @@ To reconstruct a point cloud from an image set, use `pipeline.py` as such:
 python3 /opt/code/pipeline.py -i <input directory> -o <output directory> -g <how many GPUs to use>
 ```
 
-Omit the `-g <# of GPUs>` argument or set it to 0 to perform the reconstruction with CPUs only.
+Omit the `-g <# of GPUs>` argument or set it to 0 to perform the reconstruction with CPUs only. Note that `-g <# GPUs>` is short for `--gpus <# GPUs>`.
 
 A successful reconstruction will produce several files in the output directory:
 
@@ -57,13 +57,26 @@ A successful reconstruction will produce several files in the output directory:
 
 There are several optional preprocessing steps, all of which accept values `True` or `False` (and default to `False`): 
 
-- `-s`/`--segmentation`: crops to the largest feature
-- `-b`/`--blur_detection`: detects and omits blurry images
-- `-c`/`--gamma_correction`: increases brightness of dark images
+- `--segmentation`: crops to the largest feature
+- `--blur_detection`: detects and omits blurry images
+- `--gamma_correction`: increases brightness of dark images
 
 ### PMVS2 vs. Colmap for dense reconstruction
 
-By default, PMVS2 is used for dense reconstruction on both CPU and GPU. Colmap can optionally be used with GPUs. It tends to produce significantly denser models but may run up to an order of magnitude more slowly. To enable dense reconstruction with Colmap, use `-d COLMAP`.
+By default, PMVS2 is used for dense reconstruction on both CPU and GPU. Colmap can optionally be used with GPUs. It tends to produce significantly denser models but may run up to an order of magnitude more slowly.
+
+To enable dense reconstruction with Colmap, use `-d COLMAP` (short for `--dense_strategy COLMAP`).
+
+#### Colmap configuration
+
+There are several configurable values for colmap's patch matching step during dense reconstruction. Optimal values will vary by host machine.
+
+- `--cache_size`: cache size (in GB) to use during patch matching, defaults to `32`
+- `--window_step`: patch window step size, defaults to `1`
+- `--window_radius`: patch window radius, defaults to `5`
+- `--num_iterations`: number of patch match iterations, defaults to `5`
+- `--num_samples`: number of sampled views, defaults to `15`
+- `--geom_consistency`: whether to perform geometric dense reconstruction, defaults to `False`
 
 ## Visualizing a 3D point cloud
 
