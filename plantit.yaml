@@ -10,11 +10,11 @@ params:
     type: boolean
     default: False
   - name: blur_detection
-      type: boolean
-      default: False
+    type: boolean
+    default: False
   - name: gamma_correction
-      type: boolean
-      default: False
+    type: boolean
+    default: False
 input:
   path:
   kind: directory
