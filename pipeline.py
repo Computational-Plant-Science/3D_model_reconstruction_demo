@@ -183,21 +183,21 @@ def reconstruct(
         subprocess.run("colmap patch_match_stereo" + \
                        " --workspace_path " + dense_dir_path + \
                        " --workspace_format COLMAP" + \
-                       " --PatchMatchStereo.cache_size=" + cache_size + \
-                       " --PatchMatchStereo.window_step=" + window_step + \
-                       " --PatchMatchStereo.window_radius=" + window_radius + \
-                       " --PatchMatchStereo.num_iterations=" + num_iterations + \
-                       " --PatchMatchStereo.num_samples=" + num_samples + \
-                       " --PatchMatchStereo.geom_consistency " + ('true' if geom_consistency else 'false') + \
-                       " --PatchMatchStereo.filter " + str(geom_consistency) + \
-                       ((' --PatchMatchStereo.gpu_index=' + gpu_index) if gpus else ''), shell=True)
+                       " --PatchMatchStereo.cache_size=" + str(cache_size) + \
+                       " --PatchMatchStereo.window_step=" + str(window_step) + \
+                       " --PatchMatchStereo.window_radius=" + str(window_radius) + \
+                       " --PatchMatchStereo.num_iterations=" + str(num_iterations) + \
+                       " --PatchMatchStereo.num_samples=" + str(num_samples) + \
+                       " --PatchMatchStereo.geom_consistency " + str('true' if geom_consistency else 'false') + \
+                       " --PatchMatchStereo.filter " + str('false' if geom_consistency else 'true') + \
+                       str((' --PatchMatchStereo.gpu_index=' + gpu_index) if gpus else ''), shell=True)
 
         # stereo fusion
         dense_model_path = join(output_directory, 'dense.ply')
         subprocess.run("colmap stereo_fusion" + \
-                       " --workspace_path " + join(output_directory, 'dense') + \
+                       " --workspace_path " + dense_dir_path + \
                        " --workspace_format COLMAP" + \
-                       " --input_type geometric" + \
+                       " --input_type " + str('geometric' if geom_consistency else 'photometric') + \
                        " --output_path " + dense_model_path, shell=True)
 
         # generate mesh
@@ -253,7 +253,7 @@ if __name__ == '__main__':
     ap.add_argument("--window_radius", required=False, type=int, default=3, help="Colmap patch window radius")
     ap.add_argument("--num_iterations", required=False, type=int, default=3, help="Colmap patch match iterations")
     ap.add_argument("--num_samples", required=False, type=int, default=10, help="Colmap patch match sampled views")
-    ap.add_argument("--geom_consistency", required=False, type=str2bool, nargs='?', const=True, default=False, help="Colmap geometric reconstruction")
+    ap.add_argument("--geom_consistency", type=str2bool, nargs='?', const=True, default=False, help="Colmap geometric reconstruction")
     args = vars(ap.parse_args())
 
     dense_strategy = args["dense_strategy"]
