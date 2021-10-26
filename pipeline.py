@@ -11,11 +11,18 @@ Usage: python3 pipeline.py -i <input directory> -o <output directory>
 
 Arguments:
 ("-i", "--input_directory", required=True, help="folder to find input images in")
-("-o", "--output_directory", required=True, help="where to write output files to")
-("-s", "--segmentation", required=False, default=False, help="whether to apply root segmentation")
-("-b", "--blur_detection", required=False, default=False, help="whether to omit blurry images")
-("-c", "--correct_gamma", required=False, default=False, help="whether to apply gamma correction"
-("-g", "--gpu", type=int, default=0, help="how many GPUs to use (set to 0 for CPUs-only)")
+("-o", "--output_directory", required=False, default=".", help="folder to write results to")
+("--segmentation", type=str2bool, nargs='?', const=True, default=False, help="whether to apply root segmentation")
+("--blur_detection", type=str2bool, nargs='?', const=True, default=False, help="whether to omit blurry images")
+("--gamma_correction", type=str2bool, nargs='?', const=True, default=False, help="whether to apply gamma correction")
+("-g", "--gpus", type=int, default=0, help="how many GPUs to use (set to 0 for CPUs-only)")
+("-d", "--dense_strategy", required=False, type=str, default='PMVS', help="whether to use PMVS or COLMAP for dense reconstruction")
+("--cache_size", required=False, type=int, default=32, help="Colmap patch matching cache size")
+("--window_step", required=False, type=int, default=2, help="Colmap patch window step size")
+("--window_radius", required=False, type=int, default=3, help="Colmap patch window radius")
+("--num_iterations", required=False, type=int, default=3, help="Colmap patch match iterations")
+("--num_samples", required=False, type=int, default=10, help="Colmap patch match sampled views")
+("--geom_consistency", required=False, type=str2bool, nargs='?', const=True, default=False, help="Colmap geometric reconstruction")
 """
 from distutils import util
 import multiprocessing
@@ -67,38 +74,38 @@ def reconstruct(
     # preprocessing steps
     if segmentation:
         seg_paths = [join(input_directory, file) for file in listdir(input_directory) if isfile(join(input_directory, file))]
-        if len(seg_paths) < 2: raise ValueError("Not enough files (" + str(len(seg_paths)) + ")")
+        if len(seg_paths) < 2: raise ValueError("Not enough images (" + str(len(seg_paths)) + ")")
 
         seg_dir = Path(join(output_directory, 'segmented'))
         seg_dir.mkdir(exist_ok=True)
         seg_args = [(path, seg_dir.absolute()) for path in seg_paths]
         input_directory = str(seg_dir.absolute())
 
-        print("Segmenting " + str(len(seg_paths)) + " file(s)")
+        print("Segmenting " + str(len(seg_paths)) + " images")
         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
             pool.starmap(foreground_substractor, seg_args)
     if blur_detection:
         bo_paths = [join(input_directory, file) for file in listdir(input_directory) if isfile(join(input_directory, file))]
-        if len(bo_paths) < 2: raise ValueError("Not enough files (" + str(len(bo_paths)) + ")")
+        if len(bo_paths) < 2: raise ValueError("Not enough images (" + str(len(bo_paths)) + ")")
 
         bo_dir = Path(join(output_directory, 'blur_omitted'))
         bo_dir.mkdir(exist_ok=True)
         bo_args = [(path, bo_dir.absolute()) for path in bo_paths]
         input_directory = str(bo_dir.absolute())
 
-        print("Applying blur detection to " + str(len(bo_paths)) + " file(s)")
+        print("Applying blur detection to " + str(len(bo_paths)) + " images")
         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
             pool.starmap(detect_blur, bo_args)
     if gamma_correction:
         gc_paths = [join(input_directory, file) for file in listdir(input_directory) if isfile(join(input_directory, file))]
-        if len(gc_paths) < 2: raise ValueError("Not enough files (" + str(len(gc_paths)) + ")")
+        if len(gc_paths) < 2: raise ValueError("Not enough images (" + str(len(gc_paths)) + ")")
 
         gc_dir = Path(join(output_directory, 'gamma_corrected'))
         gc_dir.mkdir(exist_ok=True)
         gc_args = [(path, gc_dir.absolute()) for path in gc_paths]
         input_directory = str(gc_dir.absolute())
 
-        print("Applying gamma correction to " + str(len(gc_paths)) + " file(s)")
+        print("Applying gamma correction to " + str(len(gc_paths)) + " images")
         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
             pool.starmap(correct_gamma, gc_args)
 
@@ -182,7 +189,7 @@ def reconstruct(
                        " --PatchMatchStereo.num_iterations=" + num_iterations + \
                        " --PatchMatchStereo.num_samples=" + num_samples + \
                        " --PatchMatchStereo.geom_consistency " + ('true' if geom_consistency else 'false') + \
-                       " --PatchMatchStereo.filter " + ('false' if geom_consistency else 'true') + \
+                       " --PatchMatchStereo.filter " + str(geom_consistency) + \
                        ((' --PatchMatchStereo.gpu_index=' + gpu_index) if gpus else ''), shell=True)
 
         # stereo fusion
@@ -242,11 +249,11 @@ if __name__ == '__main__':
     ap.add_argument("-g", "--gpus", type=int, default=0, help="how many GPUs to use (set to 0 for CPUs-only)")
     ap.add_argument("-d", "--dense_strategy", required=False, type=str, default='PMVS', help="whether to use PMVS or COLMAP for dense reconstruction")
     ap.add_argument("--cache_size", required=False, type=int, default=32, help="Colmap patch matching cache size")
-    ap.add_argument("--window_step", required=False, type=int, default=1, help="Colmap patch window step size")
-    ap.add_argument("--window_radius", required=False, type=int, default=5, help="Colmap patch window radius")
-    ap.add_argument("--num_iterations", required=False, type=int, default=5, help="Colmap patch match iterations")
-    ap.add_argument("--num_samples", required=False, type=int, default=15, help="Colmap patch match sampled views")
-    ap.add_argument("--geom_consistency", required=False, type=str2bool, nargs='?', const=True, help="Colmap patch match geometric reconstruction")
+    ap.add_argument("--window_step", required=False, type=int, default=2, help="Colmap patch window step size")
+    ap.add_argument("--window_radius", required=False, type=int, default=3, help="Colmap patch window radius")
+    ap.add_argument("--num_iterations", required=False, type=int, default=3, help="Colmap patch match iterations")
+    ap.add_argument("--num_samples", required=False, type=int, default=10, help="Colmap patch match sampled views")
+    ap.add_argument("--geom_consistency", required=False, type=str2bool, nargs='?', const=True, default=False, help="Colmap geometric reconstruction")
     args = vars(ap.parse_args())
 
     dense_strategy = args["dense_strategy"]
@@ -254,16 +261,16 @@ if __name__ == '__main__':
         raise ValueError("Dense reconstruction strategy must be either PMVS or COLMAP")
 
     reconstruct(
-        args["input_directory"],
-        args["output_directory"],
-        bool(args["segmentation"]),
-        bool(args["blur_detection"]),
-        bool(args["gamma_correction"]),
-        int(args["gpus"]),
-        dense_strategy,
-        int(args["cache_size"]),
-        int(args["window_step"]),
-        int(args["window_radius"]),
-        int(args["num_iterations"]),
-        int(args["num_samples"]),
-        bool(args["geom_consistency"]))
+        input_directory=args["input_directory"],
+        output_directory=args["output_directory"],
+        segmentation=bool(args["segmentation"]),
+        blur_detection=bool(args["blur_detection"]),
+        gamma_correction=bool(args["gamma_correction"]),
+        gpus=int(args["gpus"]),
+        dense_strategy=dense_strategy,
+        cache_size=int(args["cache_size"]),
+        window_step=int(args["window_step"]),
+        window_radius=int(args["window_radius"]),
+        num_iterations=int(args["num_iterations"]),
+        num_samples=int(args["num_samples"]),
+        geom_consistency=bool(args["geom_consistency"]))
