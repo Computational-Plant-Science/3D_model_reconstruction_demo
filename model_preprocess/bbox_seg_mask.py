@@ -249,9 +249,9 @@ def foreground_substractor(image_file):
     # construct the result file path
     result_img_path = save_path + str(filename[0:-4]) + '_seg.' + ext
     
-    #crop_img = combined_fg_bk[start_y:crop_height, start_x:crop_width]
+    crop_img = combined_fg_bk[start_y:crop_height, start_x:crop_width]
     
-    crop_img = masked_fg_contour[start_y:crop_height, start_x:crop_width]
+    #crop_img = masked_fg_contour[start_y:crop_height, start_x:crop_width]
     
     cv2.imwrite(result_img_path, crop_img)
     
