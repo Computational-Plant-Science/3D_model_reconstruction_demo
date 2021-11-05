@@ -79,7 +79,7 @@ def createMask(rows, cols, hull, value):
     return mask
     
 
-def foreground_substractor(image_file):
+def mask_segmentation(image_file):
     
   
     #parse the file name 
@@ -359,14 +359,14 @@ if __name__ == '__main__':
     # extract the bouding box for each image in file list
     with closing(Pool(processes = agents)) as pool:
         #result = pool.map(foreground_substractor, imgList)
-        pool.map(foreground_substractor, imgList)
+        pool.map(mask_segmentation, imgList)
         pool.terminate()
     
     
     
     '''
     for image_file in imgList:
-        foreground_substractor(image_file)
+        mask_segmentation(image_file)
         
     
     

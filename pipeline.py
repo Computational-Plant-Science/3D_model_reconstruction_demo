@@ -12,7 +12,8 @@ Usage: python3 pipeline.py -i <input directory> -o <output directory>
 Arguments:
 ("-i", "--input_directory", required=True, help="folder to find input images in")
 ("-o", "--output_directory", required=False, default=".", help="folder to write results to")
-("--segmentation", type=str2bool, nargs='?', const=True, default=False, help="whether to apply root segmentation")
+("--bounding_box", type=str2bool, nargs='?', const=True, default=False, help="whether to detect the root boundary and crop to a bounding box")
+("--mask_segmentation", type=str2bool, nargs='?', const=True, default=False, help="whether to segment and mask the root interior and set the image background to black")
 ("--blur_detection", type=str2bool, nargs='?', const=True, default=False, help="whether to omit blurry images")
 ("--gamma_correction", type=str2bool, nargs='?', const=True, default=False, help="whether to apply gamma correction")
 ("-g", "--gpus", type=int, default=0, help="how many GPUs to use (set to 0 for CPUs-only)")
@@ -40,6 +41,7 @@ from pathlib import Path
 import humanize
 
 from model_preprocess.bbox_seg import foreground_substractor
+from model_preprocess.bbox_seg_mask import mask_segmentation
 from model_preprocess.blur_detector_image import detect_blur
 from model_preprocess.gamma_correct import correct_gamma
 
@@ -47,7 +49,8 @@ from model_preprocess.gamma_correct import correct_gamma
 def reconstruct(
         input_directory,
         output_directory,
-        segmentation,
+        bounding_box,
+        mask_segmentation,
         blur_detection,
         gamma_correction,
         gpus,
@@ -72,7 +75,7 @@ def reconstruct(
     start_all = time.time()
 
     # preprocessing steps
-    if segmentation:
+    if bounding_box:
         seg_paths = [join(input_directory, file) for file in listdir(input_directory) if isfile(join(input_directory, file))]
         if len(seg_paths) < 2: raise ValueError("Not enough images (" + str(len(seg_paths)) + ")")
 
@@ -81,9 +84,11 @@ def reconstruct(
         seg_args = [(path, seg_dir.absolute()) for path in seg_paths]
         input_directory = str(seg_dir.absolute())
 
-        print("Segmenting " + str(len(seg_paths)) + " images")
+        print("Detecting bounding box and cropping " + str(len(seg_paths)) + " images")
         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
             pool.starmap(foreground_substractor, seg_args)
+    if mask_segmentation:
+        pass
     if blur_detection:
         bo_paths = [join(input_directory, file) for file in listdir(input_directory) if isfile(join(input_directory, file))]
         if len(bo_paths) < 2: raise ValueError("Not enough images (" + str(len(bo_paths)) + ")")
@@ -243,7 +248,8 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--input_directory", required=True, help="folder to find input images in")
     ap.add_argument("-o", "--output_directory", required=False, default=".", help="folder to write results to")
-    ap.add_argument("--segmentation", type=str2bool, nargs='?', const=True, default=False, help="whether to apply root segmentation")
+    ap.add_argument("--bounding_box", type=str2bool, nargs='?', const=True, default=False, help="whether to detect the root boundary and crop to a bounding box")
+    ap.add_argument("--mask_segmentation", type=str2bool, nargs='?', const=True, default=False, help="whether to segment and mask the root interior and set the image background to black")
     ap.add_argument("--blur_detection", type=str2bool, nargs='?', const=True, default=False, help="whether to omit blurry images")
     ap.add_argument("--gamma_correction", type=str2bool, nargs='?', const=True, default=False, help="whether to apply gamma correction")
     ap.add_argument("-g", "--gpus", type=int, default=0, help="how many GPUs to use (set to 0 for CPUs-only)")
@@ -263,7 +269,8 @@ if __name__ == '__main__':
     reconstruct(
         input_directory=args["input_directory"],
         output_directory=args["output_directory"],
-        segmentation=bool(args["segmentation"]),
+        bounding_box=bool(args["bounding_box"]),
+        mask_segmentation=bool(args['mask_segmentation']),
         blur_detection=bool(args["blur_detection"]),
         gamma_correction=bool(args["gamma_correction"]),
         gpus=int(args["gpus"]),
