@@ -113,16 +113,18 @@ def reconstruct(
     if len(image_paths) < 2: raise ValueError("Not enough images to begin reconstruction (" + str(len(image_paths)) + ")")
     print("Starting feature extraction from " + str(len(image_paths)) + " images")
 
-    # colmap's automatic reconstruction pipeline
-    database_path = join(output_directory, 'database.db')
+    # invoke colmap automatic reconstruction pipeline
+    image_dir = Path(join(output_directory, 'images'))
+    image_dir.mkdir(exist_ok=True)
+    for file in Path(input_directory).glob('*.*'): file.rename(join(output_directory, 'images', file.name))
     gpu_index = ','.join([str(i) for i in range(0, gpus)])
     if gpus: print("Using " + str(gpus) + " GPU" + ("s" if gpus > 1 else ""))
     else: print("Not using GPUs")
     command = f"colmap automatic_reconstructor" + \
-              f" --image_path {input_directory}" + \
-              f" --database_path {database_path}" + \
+              f" --workspace_path {output_directory}" + \
+              f" --image_path {image_dir}" + \
               f" --quality {quality}" + \
-              (f" --gpu_index {gpu_index}" if gpus else f" --use_gpu {0}")
+              (f" --gpu_index={gpu_index}" if gpus else f" --use_gpu={0}")
     print(f"Invoking colmap: {command}")
     subprocess.run(command)
 
