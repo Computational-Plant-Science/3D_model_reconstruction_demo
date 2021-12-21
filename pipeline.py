@@ -124,7 +124,7 @@ def reconstruct(
     command = f"colmap automatic_reconstructor" + \
               f" --workspace_path {output_directory}" + \
               f" --image_path {image_dir}" + \
-              f" --quality {quality}" + \
+              f" --quality={quality}" + \
               (f" --gpu_index={gpu_index}" if gpus else f" --use_gpu={0}")
     print(f"Invoking colmap: {command}")
     subprocess.run(command)
