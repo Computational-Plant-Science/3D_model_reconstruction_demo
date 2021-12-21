@@ -122,7 +122,7 @@ def reconstruct(
               f" --image_path {input_directory}" + \
               f" --database_path {database_path}" + \
               f" --quality {quality}" + \
-              f" --gpu_index {gpu_index}" if gpus else f" --use_gpu {0}"
+              (f" --gpu_index {gpu_index}" if gpus else f" --use_gpu {0}")
     print(f"Invoking colmap: {command}")
     subprocess.run(command)
 
