@@ -2,7 +2,7 @@ name: "DIRT3D: Reconstruction"
 author: Suxing Liu
 image: docker://computationalplantscience/dirt3d-reconstruction
 public: True
-commands: python3 /opt/code/pipeline.py -i $INPUT -o OUTPUT -g $GPUS --segmentation $SEGMENTATION --blur_detection $BLUR_DETECTION --gamma_correction $GAMMA_CORRECTION
+commands: python3 /opt/code/pipeline.py -i $INPUT -o $OUTPUT -g $GPUS --segmentation $SEGMENTATION --blur_detection $BLUR_DETECTION --gamma_correction $GAMMA_CORRECTION
 env:
 - QT_QPA_PLATFORM=offscreen
 params:
