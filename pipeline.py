@@ -54,21 +54,10 @@ def reconstruct(
         blur_detection,
         gamma_correction,
         gpus,
-        dense_strategy,
-        cache_size,
-        window_step,
-        window_radius,
-        num_iterations,
-        num_samples,
-        geom_consistency):
-    if not os.path.exists(input_directory): raise ValueError("Input directory does not exist!")
+        quality='high'):
 
-    # precompute GPU index
-    gpu_index = ','.join([str(i) for i in range(0, gpus)])
-    if gpus:
-        print("Using " + str(gpus) + " GPU" + ("s" if gpus > 1 else ""))
-    else:
-        print("Not using GPUs")
+    # make sure the data directory exists
+    if not os.path.exists(input_directory): raise ValueError("Input directory does not exist!")
 
     # start timing
     start = time.time()
@@ -124,101 +113,114 @@ def reconstruct(
     if len(image_paths) < 2: raise ValueError("Not enough images to begin reconstruction (" + str(len(image_paths)) + ")")
     print("Starting feature extraction from " + str(len(image_paths)) + " images")
 
-    # feature extraction
+    # colmap's automatic reconstruction pipeline
     database_path = join(output_directory, 'database.db')
-    subprocess.run("colmap feature_extractor" + \
-                   " --image_path " + input_directory + \
-                   " --database_path " + database_path + \
-                   ((' --SiftExtraction.gpu_index=' + gpu_index) if gpus else ' --SiftExtraction.use_gpu=0'
-                                                                                  # last 2 options prevent memory overconsumption with CPU
-                                                                                  # https://colmap.github.io/faq.html#available-functionality-without-gpu-cuda
-                                                                                  ' --SiftExtraction.num_threads=2'
-                                                                                  ' --SiftExtraction.first_octave 0'), shell=True)
+    gpu_index = ','.join([str(i) for i in range(0, gpus)])
+    if gpus: print("Using " + str(gpus) + " GPU" + ("s" if gpus > 1 else ""))
+    else: print("Not using GPUs")
+    command = f"colmap automatic_reconstructor" \
+              f" --image_path {input_directory}" \
+              f" --database_path {database_path}" \
+              f" --quality {quality}" + \
+              f" --gpu_index {gpu_index}" if gpus else f" --use_gpu {0}"
+    print(f"Invoking colmap: {command}")
+    subprocess.run(command)
 
-    end = time.time()
-    feature_extraction_delta = timedelta(seconds=(end - start))
-    print("Feature extraction completed in " + humanize.naturaldelta(feature_extraction_delta) + ", starting feature matching")
-    start = time.time()
+    # # feature extraction
+    # database_path = join(output_directory, 'database.db')
+    # subprocess.run("colmap feature_extractor" + \
+    #                " --image_path " + input_directory + \
+    #                " --database_path " + database_path + \
+    #                ((' --SiftExtraction.gpu_index=' + gpu_index) if gpus else ' --SiftExtraction.use_gpu=0'
+    #                                                                               # last 2 options prevent memory overconsumption with CPU
+    #                                                                               # https://colmap.github.io/faq.html#available-functionality-without-gpu-cuda
+    #                                                                               ' --SiftExtraction.num_threads=2'
+    #                                                                               ' --SiftExtraction.first_octave 0'), shell=True)
 
-    # feature matching
-    # TODO might need --SiftMatching.max_num_matches as per https://colmap.github.io/faq.html#feature-matching-fails-due-to-illegal-memory-access
-    subprocess.run("colmap exhaustive_matcher" + \
-                   " --database_path " + database_path + \
-                   ((' --SiftMatching.gpu_index=' + gpu_index) if gpus else ' --SiftMatching.use_gpu=0'), shell=True)
+    # end = time.time()
+    # feature_extraction_delta = timedelta(seconds=(end - start))
+    # print("Feature extraction completed in " + humanize.naturaldelta(feature_extraction_delta) + ", starting feature matching")
+    # start = time.time()
 
-    end = time.time()
-    feature_matching_delta = timedelta(seconds=(end - start))
-    print("Feature matching completed in " + humanize.naturaldelta(feature_matching_delta) + ", building sparse model")
-    start = time.time()
+    # # feature matching
+    # # TODO might need --SiftMatching.max_num_matches as per https://colmap.github.io/faq.html#feature-matching-fails-due-to-illegal-memory-access
+    # subprocess.run("colmap exhaustive_matcher" + \
+    #                " --database_path " + database_path + \
+    #                ((' --SiftMatching.gpu_index=' + gpu_index) if gpus else ' --SiftMatching.use_gpu=0'), shell=True)
 
-    # build sparse model
-    outer_sparse_dir = Path(join(output_directory, 'sparse'))
-    outer_sparse_dir.mkdir(exist_ok=True)
-    inner_sparse_dir_path = join(output_directory, 'sparse', '0')
-    sparse_model_path = join(output_directory, 'sparse.ply')
-    subprocess.run("colmap mapper" + \
-                   " --database_path " + database_path + \
-                   " --image_path " + input_directory + \
-                   " --output_path " + join(outer_sparse_dir.parent.stem, outer_sparse_dir.stem), shell=True)
-    subprocess.run("colmap model_converter" + \
-                   " --input_path " + inner_sparse_dir_path + \
-                   " --output_path " + sparse_model_path + \
-                   " --output_type PLY", shell=True)
+    # end = time.time()
+    # feature_matching_delta = timedelta(seconds=(end - start))
+    # print("Feature matching completed in " + humanize.naturaldelta(feature_matching_delta) + ", building sparse model")
+    # start = time.time()
 
-    end = time.time()
-    sparse_model_delta = timedelta(seconds=(end - start))
-    print("Sparse model completed in " + humanize.naturaldelta(sparse_model_delta) + ", building dense model")
-    start = time.time()
+    # # build sparse model
+    # outer_sparse_dir = Path(join(output_directory, 'sparse'))
+    # outer_sparse_dir.mkdir(exist_ok=True)
+    # inner_sparse_dir_path = join(output_directory, 'sparse', '0')
+    # sparse_model_path = join(output_directory, 'sparse.ply')
+    # subprocess.run("colmap mapper" + \
+    #                " --database_path " + database_path + \
+    #                " --image_path " + input_directory + \
+    #                " --output_path " + join(outer_sparse_dir.parent.stem, outer_sparse_dir.stem), shell=True)
+    # subprocess.run("colmap model_converter" + \
+    #                " --input_path " + inner_sparse_dir_path + \
+    #                " --output_path " + sparse_model_path + \
+    #                " --output_type PLY", shell=True)
 
-    dense_dir = Path(join(output_directory, 'dense'))
-    dense_dir.mkdir(exist_ok=True)
-    dense_dir_path = str(dense_dir.absolute())
+    # end = time.time()
+    # sparse_model_delta = timedelta(seconds=(end - start))
+    # print("Sparse model completed in " + humanize.naturaldelta(sparse_model_delta) + ", building dense model")
+    # start = time.time()
 
-    # image undistortion
-    subprocess.run("colmap image_undistorter" + \
-                   " --image_path " + input_directory + \
-                   " --input_path " + inner_sparse_dir_path + \
-                   " --output_path " + dense_dir_path + \
-                   " --output_type " + dense_strategy + \
-                   " --max_image_size 2000", shell=True)
+    # dense_dir = Path(join(output_directory, 'dense'))
+    # dense_dir.mkdir(exist_ok=True)
+    # dense_dir_path = str(dense_dir.absolute())
 
-    # build dense model
-    if gpus and dense_strategy == 'COLMAP':
-        # patch match
-        subprocess.run("colmap patch_match_stereo" + \
-                       " --workspace_path " + dense_dir_path + \
-                       " --workspace_format COLMAP" + \
-                       " --PatchMatchStereo.cache_size=" + str(cache_size) + \
-                       " --PatchMatchStereo.window_step=" + str(window_step) + \
-                       " --PatchMatchStereo.window_radius=" + str(window_radius) + \
-                       " --PatchMatchStereo.num_iterations=" + str(num_iterations) + \
-                       " --PatchMatchStereo.num_samples=" + str(num_samples) + \
-                       " --PatchMatchStereo.geom_consistency " + str('true' if geom_consistency else 'false') + \
-                       " --PatchMatchStereo.filter " + str('false' if geom_consistency else 'true') + \
-                       str((' --PatchMatchStereo.gpu_index=' + gpu_index) if gpus else ''), shell=True)
+    # # image undistortion
+    # subprocess.run("colmap image_undistorter" + \
+    #                " --image_path " + input_directory + \
+    #                " --input_path " + inner_sparse_dir_path + \
+    #                " --output_path " + dense_dir_path + \
+    #                " --output_type " + dense_strategy + \
+    #                " --max_image_size 2000", shell=True)
 
-        # stereo fusion
-        dense_model_path = join(output_directory, 'dense.ply')
-        subprocess.run("colmap stereo_fusion" + \
-                       " --workspace_path " + dense_dir_path + \
-                       " --workspace_format COLMAP" + \
-                       " --input_type " + str('geometric' if geom_consistency else 'photometric') + \
-                       " --output_path " + dense_model_path, shell=True)
+    # # build dense model
+    # if gpus and dense_strategy == 'COLMAP':
+    #     # patch match
+    #     subprocess.run("colmap patch_match_stereo" + \
+    #                    " --workspace_path " + dense_dir_path + \
+    #                    " --workspace_format COLMAP" + \
+    #                    " --PatchMatchStereo.cache_size=" + str(cache_size) + \
+    #                    " --PatchMatchStereo.window_step=" + str(window_step) + \
+    #                    " --PatchMatchStereo.window_radius=" + str(window_radius) + \
+    #                    " --PatchMatchStereo.num_iterations=" + str(num_iterations) + \
+    #                    " --PatchMatchStereo.num_samples=" + str(num_samples) + \
+    #                    " --PatchMatchStereo.geom_consistency " + str('true' if geom_consistency else 'false') + \
+    #                    " --PatchMatchStereo.filter " + str('false' if geom_consistency else 'true') + \
+    #                    str((' --PatchMatchStereo.gpu_index=' + gpu_index) if gpus else ''), shell=True)
 
-        # generate mesh
-        mesh_model_path = join(output_directory, 'mesh.ply')
-        subprocess.run("colmap poisson_mesher" + \
-                       " --input_path " + dense_model_path + \
-                       " --output_path " + mesh_model_path, shell=True)
-    else:
-        if dense_strategy == 'COLMAP':
-            print("COLMAP dense reconstruction only supported on GPU hardware")
+    #     # stereo fusion
+    #     dense_model_path = join(output_directory, 'dense.ply')
+    #     subprocess.run("colmap stereo_fusion" + \
+    #                    " --workspace_path " + dense_dir_path + \
+    #                    " --workspace_format COLMAP" + \
+    #                    " --input_type " + str('geometric' if geom_consistency else 'photometric') + \
+    #                    " --output_path " + dense_model_path, shell=True)
 
-        # PMVS2 for CPU dense reconstruction
-        subprocess.run("pmvs2 " + join(output_directory, 'dense', 'pmvs') + "/ option-all", shell=True)
-        subprocess.run("mv " + join(output_directory, 'dense', 'pmvs', 'models', 'option-all.ply') + \
-                       " " + join(output_directory, 'dense.ply'),  # move the model to the output dir
-                       shell=True)
+    #     # generate mesh
+    #     mesh_model_path = join(output_directory, 'mesh.ply')
+    #     subprocess.run("colmap poisson_mesher" + \
+    #                    " --input_path " + dense_model_path + \
+    #                    " --output_path " + mesh_model_path, shell=True)
+    # else:
+    #     if dense_strategy == 'COLMAP':
+    #         print("COLMAP dense reconstruction only supported on GPU hardware")
+
+    #     # PMVS2 for CPU dense reconstruction
+    #     subprocess.run("pmvs2 " + join(output_directory, 'dense', 'pmvs') + "/ option-all", shell=True)
+    #     subprocess.run("mv " + join(output_directory, 'dense', 'pmvs', 'models', 'option-all.ply') + \
+    #                    " " + join(output_directory, 'dense.ply'),  # move the model to the output dir
+    #                    shell=True)
 
     end = time.time()
     dense_model_delta = timedelta(seconds=(end - start))
