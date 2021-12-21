@@ -222,23 +222,23 @@ def reconstruct(
     #                    " " + join(output_directory, 'dense.ply'),  # move the model to the output dir
     #                    shell=True)
 
-    end = time.time()
-    dense_model_delta = timedelta(seconds=(end - start))
-    print("Dense model completed in " + humanize.naturaldelta(dense_model_delta))
+    # end = time.time()
+    # dense_model_delta = timedelta(seconds=(end - start))
+    # print("Dense model completed in " + humanize.naturaldelta(dense_model_delta))
 
     total_delta = timedelta(seconds=(end - start_all))
     print("Reconstruction completed in " + humanize.naturaldelta(total_delta))
 
     # write time cost data to CSV
-    with open(join(output_directory, 'times.csv'), 'w') as file:
-        writer = csv.writer(file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        writer.writerow(['preprocessing', 'feature_extraction', 'feature_matching', 'sparse_model', 'dense_model'])
-        writer.writerow([
-            preprocessing_delta.total_seconds(),
-            feature_matching_delta.total_seconds(),
-            feature_matching_delta.total_seconds(),
-            sparse_model_delta.total_seconds(),
-            dense_model_delta.total_seconds()])
+    # with open(join(output_directory, 'times.csv'), 'w') as file:
+    #     writer = csv.writer(file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    #     writer.writerow(['preprocessing', 'feature_extraction', 'feature_matching', 'sparse_model', 'dense_model'])
+    #     writer.writerow([
+    #         preprocessing_delta.total_seconds(),
+    #         feature_matching_delta.total_seconds(),
+    #         feature_matching_delta.total_seconds(),
+    #         sparse_model_delta.total_seconds(),
+    #         dense_model_delta.total_seconds()])
 
 
 # adapted from https://stackoverflow.com/a/43357954/6514033
@@ -255,18 +255,12 @@ if __name__ == '__main__':
     ap.add_argument("--blur_detection", type=str2bool, nargs='?', const=True, default=False, help="whether to omit blurry images")
     ap.add_argument("--gamma_correction", type=str2bool, nargs='?', const=True, default=False, help="whether to apply gamma correction")
     ap.add_argument("-g", "--gpus", type=int, default=0, help="how many GPUs to use (set to 0 for CPUs-only)")
-    ap.add_argument("-d", "--dense_strategy", required=False, type=str, default='PMVS', help="whether to use PMVS or COLMAP for dense reconstruction")
-    ap.add_argument("--cache_size", required=False, type=int, default=32, help="Colmap patch matching cache size")
-    ap.add_argument("--window_step", required=False, type=int, default=2, help="Colmap patch window step size")
-    ap.add_argument("--window_radius", required=False, type=int, default=3, help="Colmap patch window radius")
-    ap.add_argument("--num_iterations", required=False, type=int, default=3, help="Colmap patch match iterations")
-    ap.add_argument("--num_samples", required=False, type=int, default=10, help="Colmap patch match sampled views")
-    ap.add_argument("--geom_consistency", type=str2bool, nargs='?', const=True, default=False, help="Colmap geometric reconstruction")
+    ap.add_argument("-q", "--quality", required=False, default="high", help="reconstruction quality")
     args = vars(ap.parse_args())
 
-    dense_strategy = args["dense_strategy"]
-    if dense_strategy != 'PMVS' and dense_strategy != 'COLMAP':
-        raise ValueError("Dense reconstruction strategy must be either PMVS or COLMAP")
+    # dense_strategy = args["dense_strategy"]
+    # if dense_strategy != 'PMVS' and dense_strategy != 'COLMAP':
+    #     raise ValueError("Dense reconstruction strategy must be either PMVS or COLMAP")
 
     reconstruct(
         input_directory=args["input_directory"],
@@ -276,10 +270,4 @@ if __name__ == '__main__':
         blur_detection=bool(args["blur_detection"]),
         gamma_correction=bool(args["gamma_correction"]),
         gpus=int(args["gpus"]),
-        dense_strategy=dense_strategy,
-        cache_size=int(args["cache_size"]),
-        window_step=int(args["window_step"]),
-        window_radius=int(args["window_radius"]),
-        num_iterations=int(args["num_iterations"]),
-        num_samples=int(args["num_samples"]),
-        geom_consistency=bool(args["geom_consistency"]))
+        quality=args["quality"])
