@@ -127,7 +127,7 @@ def reconstruct(
               f" --quality={quality}" + \
               (f" --gpu_index={gpu_index}" if gpus else f" --use_gpu={0}")
     print(f"Invoking colmap: {command}")
-    subprocess.run(command)
+    subprocess.run(command, shell=True)
 
     # # feature extraction
     # database_path = join(output_directory, 'database.db')
