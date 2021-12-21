@@ -118,9 +118,9 @@ def reconstruct(
     gpu_index = ','.join([str(i) for i in range(0, gpus)])
     if gpus: print("Using " + str(gpus) + " GPU" + ("s" if gpus > 1 else ""))
     else: print("Not using GPUs")
-    command = f"colmap automatic_reconstructor" \
-              f" --image_path {input_directory}" \
-              f" --database_path {database_path}" \
+    command = f"colmap automatic_reconstructor" + \
+              f" --image_path {input_directory}" + \
+              f" --database_path {database_path}" + \
               f" --quality {quality}" + \
               f" --gpu_index {gpu_index}" if gpus else f" --use_gpu {0}"
     print(f"Invoking colmap: {command}")
