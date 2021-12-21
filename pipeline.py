@@ -33,6 +33,7 @@ import os
 import os.path
 import time
 import csv
+import shutil
 from datetime import timedelta
 from os import listdir
 from os.path import join, isfile
@@ -116,7 +117,7 @@ def reconstruct(
     # invoke colmap automatic reconstruction pipeline
     image_dir = Path(join(output_directory, 'images'))
     image_dir.mkdir(exist_ok=True)
-    for file in Path(input_directory).glob('*.*'): file.rename(join(output_directory, 'images', file.name))
+    for file in Path(input_directory).glob('*.*'): shutil.copy(file.resolve(), join(output_directory, 'images', file.name))
     gpu_index = ','.join([str(i) for i in range(0, gpus)])
     if gpus: print("Using " + str(gpus) + " GPU" + ("s" if gpus > 1 else ""))
     else: print("Not using GPUs")
