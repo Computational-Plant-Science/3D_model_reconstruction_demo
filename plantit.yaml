@@ -26,7 +26,7 @@ output:
   include:
     patterns:
       - ply
-logo: media/Root3D.png
+logo: media/DIRTX-3D.png
 gpu: True
 jobqueue:
   walltime: "12:00:00"
