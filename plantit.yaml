@@ -1,4 +1,4 @@
-name: "DIRT\3D: Reconstruction"
+name: DIRT\3D Reconstruction
 author: Suxing Liu
 image: docker://computationalplantscience/dirt3d-reconstruction
 public: True
