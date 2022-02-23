@@ -4,7 +4,7 @@ image: docker://computationalplantscience/dirt3d-reconstruction
 public: True
 doi:
   - 10.1093/plphys/kiab311
-commands: python3 /opt/code/pipeline.py -i $INPUT -o $OUTPUT -g $GPUS --segmentation $MASK_SEGMENTATION --blur_detection $BLUR_DETECTION --gamma_correction $GAMMA_CORRECTION
+commands: python3 /opt/code/pipeline.py -i $INPUT -o $OUTPUT -g $GPUS --mask_segmentation $MASK_SEGMENTATION --blur_detection $BLUR_DETECTION --gamma_correction $GAMMA_CORRECTION
 env:
 - QT_QPA_PLATFORM=offscreen
 params:
