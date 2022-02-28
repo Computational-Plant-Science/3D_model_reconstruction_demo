@@ -31,7 +31,7 @@ output:
 logo: media/DIRTX-3D.png
 gpu: True
 jobqueue:
-  walltime: "12:00:00"
-  memory: "20GB"
+  walltime: "48:00:00"
+  memory: "50GB"
   processes: 1
   cores: 1
