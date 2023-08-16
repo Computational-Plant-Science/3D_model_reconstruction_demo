@@ -1,12 +1,14 @@
-name: "DIRT3D: Reconstruction"
+name: DIRT\3D Reconstruction
 author: Suxing Liu
 image: docker://computationalplantscience/dirt3d-reconstruction
 public: True
-commands: python3 /opt/code/pipeline.py -i $INPUT -o OUTPUT -g $GPU -s $SEGMENTATION -bd $BLUR_DETECTION -gc $GAMMA_CORRECTION
+doi:
+  - 10.1093/plphys/kiab311
+commands: python3 /opt/code/pipeline.py -i $INPUT -o $OUTPUT -g $GPUS -d $([ $GPUS -gt 0 ] && echo "COLMAP" || echo "PMVS") --mask_segmentation $MASK_SEGMENTATION --blur_detection $BLUR_DETECTION --gamma_correction $GAMMA_CORRECTION
 env:
 - QT_QPA_PLATFORM=offscreen
 params:
-  - name: segmentation
+  - name: mask_segmentation
     type: boolean
     default: False
   - name: blur_detection
@@ -26,10 +28,10 @@ output:
   include:
     patterns:
       - ply
-logo: media/Root3D.png
+logo: media/DIRTX-3D.png
 gpu: True
 jobqueue:
-  walltime: "12:00:00"
-  memory: "20GB"
+  walltime: "48:00:00"
+  memory: "50GB"
   processes: 1
   cores: 1
