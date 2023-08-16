@@ -9,7 +9,7 @@ Author-email: suxingliu@gmail.com
 
 USAGE:
 
-python3 bbox_seg.py -p ~/example/test/ -ft jpg 
+python3 bbox_seg_mask.py -p ~/example/test/ -ft jpg 
 
 
 argument:
@@ -30,7 +30,7 @@ import numpy as np
 #import matplotlib.pyplot as plt
 
 import glob
-
+from math import atan2, cos, sin, sqrt, pi, radians
 
 import multiprocessing
 from multiprocessing import Pool
@@ -68,6 +68,42 @@ def mkdir(path):
         return False
 
 
+def get_orientation(pts):
+    
+    sz = len(pts)
+    data_pts = np.empty((sz, 2), dtype=np.float64)
+    for i in range(data_pts.shape[0]):
+        data_pts[i,0] = pts[i,0,0]
+        data_pts[i,1] = pts[i,0,1]
+    # Perform PCA analysis
+    mean = np.empty((0))
+    mean, eigenvectors, eigenvalues = cv2.PCACompute2(data_pts, mean)
+    # Store the center of the object
+    cntr = (int(mean[0,0]), int(mean[0,1]))
+    
+    '''
+    cv2.circle(img, cntr, 3, (255, 0, 255), 2)
+    p1 = (cntr[0] + 0.02 * eigenvectors[0,0] * eigenvalues[0,0], cntr[1] + 0.02 * eigenvectors[0,1] * eigenvalues[0,0])
+    p2 = (cntr[0] - 0.02 * eigenvectors[1,0] * eigenvalues[1,0], cntr[1] - 0.02 * eigenvectors[1,1] * eigenvalues[1,0])
+    draw_axis(img, cntr, p1, (0, 150, 0), 1)
+    draw_axis(img, cntr, p2, (200, 150, 0), 5)
+    '''
+    
+    angle = atan2(eigenvectors[0,1], eigenvectors[0,0]) # orientation in radians
+    
+    print("orientation in radians is {}".format(angle*180/pi))
+    
+    return angle
+
+
+def slope(x1, y1, x2, y2):
+    if x1 == x2:
+        return 0
+    slope = (y2-y1)/(x2-x1)
+    theta = np.rad2deg(np.arctan(slope))
+    return theta
+
+
 def createMask(rows, cols, hull, value):
     
     # black image
@@ -96,7 +132,10 @@ def foreground_substractor(image_file):
     if image is None:
         print(f"Could not load image {image_file}, skipping")
         return
-        
+    
+    
+    ori = image.copy()
+    
     #get size of image
     img_height, img_width = image.shape[:2]
     
@@ -107,11 +146,11 @@ def foreground_substractor(image_file):
     # Convert BGR to GRAY
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     
-    #blur = cv2.blur(gray, (3, 3)) # blur the image
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
+    blur = cv2.blur(gray, (3, 3)) # blur the image
+    #blur = cv2.GaussianBlur(gray, (25, 25), 0)
     
     #Obtain the threshold image using OTSU adaptive filter
-    ret, thresh = cv2.threshold(blur, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    ret, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
     
     #thresh = cv2.erode(thresh, None, iterations=2)
     
@@ -127,6 +166,7 @@ def foreground_substractor(image_file):
     #find the max contour 
     c = max(cnts, key = cv2.contourArea)
     
+
     mask_contour = createMask(img_height, img_width, c, 0)
     
     masked_fg_contour = cv2.bitwise_and(image, image, mask = mask_contour)
@@ -152,6 +192,62 @@ def foreground_substractor(image_file):
     avg_color_per_row = np.average(masked_bk_gray, axis=0)
     
     avg_color = int(np.average(avg_color_per_row, axis=0))
+    
+    '''
+    max_contour = c
+    
+    #get_orientation(max_contour)
+    
+    rect = cv2.minAreaRect(max_contour)
+    box = cv2.boxPoints(rect)
+    box = np.int0(box)
+    orientation = slope(box[0][0], box[0][1], box[1][0], box[1][1])
+    
+    #draw bounding box
+    cv2.drawContours(masked_fg_contour, [box],0,(0,0,255),5)
+
+    print("Image orientation in degress: ", orientation)
+    
+    M = cv2.moments(max_contour)
+
+    if M["m00"] > 0:
+        cX = int(M["m10"] / M["m00"])
+        cY = int(M["m01"] / M["m00"])
+
+    #fit elipse
+    ellipse = cv2.fitEllipse(max_contour)
+    (xc,yc),(d1,d2),angle = ellipse
+    P1x = cX
+    P1y = cY
+    length = 350
+
+    #calculate vector line at angle of bounding box
+    P2x = int(P1x + length * cos(radians(angle)))
+    P2y = int(P1y + length * sin(radians(angle)))
+     #draw vector line
+    cv2.line(masked_fg_contour,(cX, cY),(P2x,P2y),(0,0,255),5)
+    
+    cv2.ellipse(masked_fg_contour, ellipse, (0, 255, 0), 3)
+    # draw circle at center
+    xc, yc = ellipse[0]
+    cv2.circle(masked_fg_contour, (int(xc),int(yc)), 10, (255, 255, 255), -1)
+
+    # draw vertical line
+    # compute major radius
+    rmajor = max(d1,d2)/2
+    if angle > 90:
+        angle = angle - 90
+    else:
+        angle = angle + 90
+    print(angle)
+    xtop = xc + cos(radians(angle))*rmajor
+    ytop = yc + sin(radians(angle))*rmajor
+    xbot = xc + cos(radians(angle+180))*rmajor
+    ybot = yc + sin(radians(angle+180))*rmajor
+    cv2.line(masked_fg_contour, (int(xtop),int(ytop)), (int(xbot),int(ybot)), (0, 0, 255), 3)
+
+    '''
+    
     
     #print(avg_color)
     
@@ -210,7 +306,7 @@ def foreground_substractor(image_file):
     # construct the result file path
     result_img_path = save_path + str(filename[0:-4]) + '_seg.' + ext
     
-    cv2.imwrite(result_img_path, masked)
+    cv2.imwrite(result_img_path, trait_img)
     '''
     ##############################################################
     
@@ -249,10 +345,16 @@ def foreground_substractor(image_file):
     # construct the result file path
     result_img_path = save_path + str(filename[0:-4]) + '_seg.' + ext
     
-    crop_img = combined_fg_bk[start_y:crop_height, start_x:crop_width]
+    #crop_img = combined_fg_bk[start_y:crop_height, start_x:crop_width]
     
     #crop_img = masked_fg_contour[start_y:crop_height, start_x:crop_width]
     
+    if args['bounding_box'] == 1:
+        crop_img = ori[start_y:crop_height, start_x:crop_width]
+    else:
+        #crop_img = combined_fg_bk[start_y:crop_height, start_x:crop_width]
+        crop_img = masked_fg_contour[start_y:crop_height, start_x:crop_width]
+        
     cv2.imwrite(result_img_path, crop_img)
     
     
@@ -323,6 +425,7 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--path", required = True,    help = "path to image file")
     ap.add_argument("-ft", "--filetype", required = False,  default = 'jpg' ,    help = "image filetype")
+    ap.add_argument("-b", "--bounding_box", required = False,  type = int, default = 0, help = "using bounding box")
     args = vars(ap.parse_args())
 
     # setting path to model file

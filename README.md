@@ -1,10 +1,14 @@
-# DIRT3D Reconstruction
+# DIRT/3D: 3D root phenotyping system for field-grown maize roots
 
-Reconstruct a 3D point cloud root model from images.
+Pipeline: Build 3D root models from images captured by 3D root scanner, and compute 3D root trait by analyzing 3D root models and computing 3D root model structures.
+
+This repo was to Reconstruct a 3D point cloud root model from images.
  
 For example, a real root and a reconstruction, side by side:
 
-![Optional Text](../master/media/ProjectDemo.gif)
+![3D root scanner prototype](../master/media/3D_scanner.gif)
+
+![3D root model reconstruction](../master/media/3D_model.gif)
     
 # Installation
 
