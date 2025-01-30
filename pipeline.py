@@ -40,19 +40,16 @@ from pathlib import Path
 
 import humanize
 
+'''
 from model_preprocess.bbox_seg import foreground_substractor
 from model_preprocess.bbox_seg_mask import mask_segmentation
 from model_preprocess.blur_detector_image import detect_blur
 from model_preprocess.gamma_correct import correct_gamma
-
+'''
 
 def reconstruct(
         input_directory,
         output_directory,
-        bounding_box,
-        mask_segmentation,
-        blur_detection,
-        gamma_correction,
         gpus,
         dense_strategy,
         cache_size,
@@ -73,7 +70,8 @@ def reconstruct(
     # start timing
     start = time.time()
     start_all = time.time()
-
+    
+    '''
     # preprocessing steps
     if bounding_box:
         seg_paths = [join(input_directory, file) for file in listdir(input_directory) if isfile(join(input_directory, file))]
@@ -113,7 +111,7 @@ def reconstruct(
         print("Applying gamma correction to " + str(len(gc_paths)) + " images")
         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
             pool.starmap(correct_gamma, gc_args)
-
+    '''
     end = time.time()
     preprocessing_delta = timedelta(seconds=(end - start))
     print("Preprocessing completed in " + humanize.naturaldelta(preprocessing_delta))
@@ -248,10 +246,10 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--input_directory", required=True, help="folder to find input images in")
     ap.add_argument("-o", "--output_directory", required=False, default=".", help="folder to write results to")
-    ap.add_argument("--bounding_box", type=str2bool, nargs='?', const=True, default=False, help="whether to detect the root boundary and crop to a bounding box")
-    ap.add_argument("--mask_segmentation", type=str2bool, nargs='?', const=True, default=False, help="whether to segment and mask the root interior and set the image background to black")
-    ap.add_argument("--blur_detection", type=str2bool, nargs='?', const=True, default=False, help="whether to omit blurry images")
-    ap.add_argument("--gamma_correction", type=str2bool, nargs='?', const=True, default=False, help="whether to apply gamma correction")
+    #ap.add_argument("--bounding_box", type=str2bool, nargs='?', const=True, default=False, help="whether to detect the root boundary and crop to a bounding box")
+    #ap.add_argument("--mask_segmentation", type=str2bool, nargs='?', const=True, default=False, help="whether to segment and mask the root interior and set the image background to black")
+    #ap.add_argument("--blur_detection", type=str2bool, nargs='?', const=True, default=False, help="whether to omit blurry images")
+    #ap.add_argument("--gamma_correction", type=str2bool, nargs='?', const=True, default=False, help="whether to apply gamma correction")
     ap.add_argument("-g", "--gpus", type=int, default=0, help="how many GPUs to use (set to 0 for CPUs-only)")
     ap.add_argument("-d", "--dense_strategy", required=False, type=str, default='PMVS', help="whether to use PMVS or COLMAP for dense reconstruction")
     ap.add_argument("--cache_size", required=False, type=int, default=32, help="Colmap patch matching cache size")
@@ -269,10 +267,6 @@ if __name__ == '__main__':
     reconstruct(
         input_directory=args["input_directory"],
         output_directory=args["output_directory"],
-        bounding_box=bool(args["bounding_box"]),
-        mask_segmentation=bool(args['mask_segmentation']),
-        blur_detection=bool(args["blur_detection"]),
-        gamma_correction=bool(args["gamma_correction"]),
         gpus=int(args["gpus"]),
         dense_strategy=dense_strategy,
         cache_size=int(args["cache_size"]),
