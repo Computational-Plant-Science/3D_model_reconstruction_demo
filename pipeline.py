@@ -40,12 +40,12 @@ from os.path import join, isfile
 from pathlib import Path
 
 import humanize
-
+'''
 from model_preprocess.bbox_seg import foreground_substractor
 from model_preprocess.bbox_seg_mask import mask_segmentation
 from model_preprocess.blur_detector_image import detect_blur
 from model_preprocess.gamma_correct import correct_gamma
-
+'''
 
 def reconstruct(
         input_directory,
@@ -63,7 +63,7 @@ def reconstruct(
     # start timing
     start = time.time()
     start_all = time.time()
-
+    '''
     # preprocessing steps
     if bounding_box:
         seg_paths = [join(input_directory, file) for file in listdir(input_directory) if isfile(join(input_directory, file))]
@@ -103,7 +103,7 @@ def reconstruct(
         print("Applying gamma correction to " + str(len(gc_paths)) + " images")
         with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
             pool.starmap(correct_gamma, gc_args)
-
+    '''
     end = time.time()
     preprocessing_delta = timedelta(seconds=(end - start))
     print("Preprocessing completed in " + humanize.naturaldelta(preprocessing_delta))
