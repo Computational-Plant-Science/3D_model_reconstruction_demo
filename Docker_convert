@@ -1,0 +1,137 @@
+FROM ubuntu:20.04 AS spython-base
+ADD ./* /opt/code
+
+LABEL Maintainer: Suxing Liu, Wes Bonelli
+LABEL mkdir ${SINGULARITY_ROOTFS}/srv/images
+LABEL mkdir ${SINGULARITY_ROOTFS}/srv/images/sparse
+LABEL mkdir ${SINGULARITY_ROOTFS}/srv/images/sparse/0
+LABEL mkdir ${SINGULARITY_ROOTFS}/opt/code/
+ENV PATH=$PATH:/opt/code/vsfm/bin/
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/code/vsfm/bin/
+RUN apt-get -ym update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+git \
+wget \
+cmake \
+tzdata \
+build-essential \
+libboost-program-options-dev \
+libboost-filesystem-dev \
+libboost-graph-dev \
+libboost-regex-dev \
+libboost-system-dev \
+libboost-test-dev \
+libeigen3-dev \
+libsuitesparse-dev \
+libfreeimage-dev \
+libgoogle-glog-dev \
+libgflags-dev \
+libglew-dev \
+qtbase5-dev \
+libqt5opengl5-dev \
+libcgal-dev
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+unzip \
+nano \
+glew-utils \
+imagemagick \
+libgtk2.0-dev \
+libglew-dev \
+libdevil-dev \
+libboost-all-dev \
+libatlas-cpp-0.6-dev \
+libatlas-base-dev \
+libatlas3-base \
+liblapack3 \
+libblas3 \
+libblas-dev \
+libcminpack-dev \
+libgfortran5 \
+libmetis-edf-dev \
+libparmetis-dev \
+libjpeg-turbo8 \
+libgsl-dev \
+freeglut3-dev \
+dos2unix
+RUN apt-get -ym install libatlas-base-dev libsuitesparse-dev
+RUN git clone https://ceres-solver.googlesource.com/ceres-solver
+RUN git clone https://github.com/colmap/colmap.git
+RUN cd ceres-solver
+
+RUN git fetch --tags
+RUN latestTag=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+RUN git checkout $latestTag
+
+
+RUN mkdir build
+RUN cd build
+RUN cmake .. -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF
+RUN make
+RUN make install
+RUN cd ../..
+RUN cd colmap
+RUN git checkout master
+RUN mkdir build
+RUN cd build
+RUN cmake ../
+RUN make
+RUN make install
+RUN cd /opt/code/
+RUN wget http://ccwu.me/vsfm/download/VisualSFM_linux_64bit.zip
+RUN unzip VisualSFM_linux_64bit.zip
+RUN rm VisualSFM_linux_64bit.zip
+RUN cd vsfm
+RUN sed -i 's/LIB_LIST +=/LIB_LIST += -no-pie /' /opt/code/vsfm/makefile
+RUN make
+RUN cd /opt/code/
+RUN wget https://github.com/pitzer/SiftGPU/archive/master.zip
+RUN unzip master.zip
+RUN rm  master.zip
+RUN mv SiftGPU-master SiftGPU
+RUN cd /opt/code/SiftGPU
+RUN make
+RUN cp /opt/code/SiftGPU/bin/libsiftgpu.so /opt/code/vsfm/bin
+RUN cd /opt/code/
+RUN wget http://grail.cs.washington.edu/projects/mcba/pba_v1.0.5.zip
+RUN unzip pba_v1.0.5.zip
+RUN rm pba_v1.0.5.zip
+RUN cd /opt/code/pba
+RUN dos2unix makefile_no_gpu
+RUN make -f makefile_no_gpu
+RUN cp -v /opt/code/pba/bin/libpba_no_gpu.so /opt/code/vsfm/bin/libpba.so
+RUN cd /opt/code/
+RUN wget https://github.com/pmoulon/CMVS-PMVS/archive/master.zip
+RUN unzip master.zip
+RUN rm master.zip
+RUN mv CMVS-PMVS-master CMVS-PMVS
+RUN mkdir -p /opt/code/CMVS-PMVS/program/build
+RUN cd /opt/code/CMVS-PMVS/program/build
+RUN cmake ..
+RUN make install
+RUN cp /opt/code/CMVS-PMVS/program/build/main/cmvs /opt/code/vsfm/bin/
+RUN cp /opt/code/CMVS-PMVS/program/build/main/pmvs2 /opt/code/vsfm/bin/
+RUN cp /opt/code/CMVS-PMVS/program/build/main/genOption /opt/code/vsfm/bin/
+RUN cd /opt/code/
+RUN wget http://www.cs.utexas.edu/users/dml/Software/graclus1.2.tar.gz
+RUN tar xzf graclus1.2.tar.gz
+RUN rm graclus1.2.tar.gz
+RUN sed -i 's/COPTIONS = -DNUMBITS=32/COPTIONS = -DNUMBITS=64/' /opt/code/graclus1.2/Makefile.in
+RUN cd /opt/code/graclus1.2
+RUN make
+RUN cd /opt/code/
+RUN wget http://www.vlfeat.org/download/vlfeat-0.9.19-bin.tar.gz
+RUN tar xzf vlfeat-0.9.19-bin.tar.gz
+RUN rm vlfeat-0.9.19-bin.tar.gz
+RUN cp -v /opt/code/vlfeat-0.9.19/bin/glnxa64/* /opt/code/vsfm/bin/
+RUN cp config/nv.ini /opt/code/vsfm/bin/nv.ini
+RUN mkdir /lscratch /db /work /scratch
+RUN chmod -R a+rwx /opt/code
+RUN mkdir -p /opt/code/vsfm/bin/log && \
+mkdir -p /opt/code/vsfm/bin/temp/log && \
+touch /opt/code/vsfm/bin/temp/temp.pgm && \
+touch /opt/code/vsfm/bin/temp/temp.sift.sift && \
+ln -s /opt/code/vsfm/bin/temp/temp.pgm /opt/code/vsfm/bin/temp.pgm && \
+ln -s /opt/code/vsfm/bin/temp/temp.sift.sift /opt/code/vsfm/bin/temp.sift.sift && \
+ln -s /opt/code/vsfm/bin/temp/log /opt/code/vsfm/bin/log
+RUN strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so
+CMD /opt/code/vsfm/bin/VisualSFM "$@"

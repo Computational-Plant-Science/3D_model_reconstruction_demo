@@ -3,6 +3,11 @@ LABEL maintainer="Suxing Liu, Wes Bonelli"
 COPY . /opt/code
 WORKDIR /opt/code
 
+
+RUN apt -y update 
+
+
+
 RUN apt-get -ym update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
     git \
@@ -34,78 +39,20 @@ RUN apt-get -ym update && \
     qtbase5-dev \
     libqt5opengl5-dev \
     libcgal-dev \
-    unzip
-#
-# RUN apt-get -ym update && \
-#     DEBIAN_FRONTEND=noninteractive apt-get install -y \
-#     unzip \
-#     nano \
-#     glew-utils \
-#     imagemagick \
-#     libgtk2.0-dev \
-#     libglew-dev \
-#     libdevil-dev \
-#     libboost-all-dev \
-#     libatlas-cpp-0.6-dev \
-#     libatlas-base-dev \
-#     libatlas3-base \
-#     liblapack3 \
-#     libblas3 \
-#     libblas-dev \
-#     libcminpack-dev \
-#     libgfortran5 \
-#     libmetis-edf-dev \
-#     libparmetis-dev \
-#     libjpeg-turbo8 \
-#     libgsl-dev \
-#     libsuitesparse-dev \
-#     dos2unix
+    unzip 
 
-# Install PBA
-# RUN wget http://grail.cs.washington.edu/projects/mcba/pba_v1.0.5.zip && \
-# 	unzip pba_v1.0.5.zip && \
-# 	rm pba_v1.0.5.zip && \
-# 	cd /opt/code/pba && \
-# 	dos2unix makefile_no_gpu && \
-# 	make -f makefile_no_gpu && \
-# 	cp -v /opt/code/pba/bin/libpba_no_gpu.so /opt/code/vsfm/bin/libpba.so
-
-# Install CMVS-PMVS
-RUN wget https://github.com/pmoulon/CMVS-PMVS/archive/master.zip && \
-	unzip master.zip && \
-	rm master.zip && \
-	mv CMVS-PMVS-master CMVS-PMVS && \
-	mkdir -p /opt/code/CMVS-PMVS/program/build && \
-	cd /opt/code/CMVS-PMVS/program/build && \
-	cmake .. && \
-	make install
-
-# Install Graclus
-# RUN wget http://www.cs.utexas.edu/users/dml/Software/graclus1.2.tar.gz && \
-# 	tar xzf graclus1.2.tar.gz && \
-# 	rm graclus1.2.tar.gz && \
-# 	#cp patches/graclus.patch /opt/code/graclus1.2/graclus.patch && \
-# 	sed -i 's/COPTIONS = -DNUMBITS=32/COPTIONS = -DNUMBITS=64/' /opt/code/graclus1.2/Makefile.in && \
-# 	cd /opt/code/graclus1.2 && \
-# 	make
-
-# Install vlfeat
-# RUN wget http://www.vlfeat.org/download/vlfeat-0.9.19-bin.tar.gz && \
-# 	tar xzf vlfeat-0.9.19-bin.tar.gz && \
-# 	rm vlfeat-0.9.19-bin.tar.gz && \
-# 	cp -v /opt/code/vlfeat-0.9.19/bin/glnxa64/* /opt/code/vsfm/bin/
 
 RUN mkdir /lscratch /db /work /scratch && \
     chmod -R a+rwx /opt/code
 
-# PyQt bug fix
+
 RUN strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so
 
-# Install Python dependencies
+
 RUN pip3 install --upgrade pip && \
     pip3 install -r /opt/code/requirements.txt
 
-# Set environment variables
+
 ENV QT_QPA_PLATFORM=offscreen
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
